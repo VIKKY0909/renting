@@ -98,6 +98,7 @@ export async function getProductById(id: string) {
       rental_price, security_deposit, original_price, bust, waist, length, sleeve_length,
       images, condition, status, is_available, total_rentals, average_rating,
       available_from, available_until, created_at, updated_at,
+      owner_id,
       owner:profiles!products_owner_id_fkey(id, full_name, avatar_url, city, state),
       category:categories!products_category_id_fkey(id, name, slug),
       reviews:reviews(

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Heart, Share2, Star, Calendar, Ruler, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,6 +17,7 @@ import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import { formatDateFull } from "@/lib/utils"
 import { toast } from "sonner"
+import { checkProductAvailability } from "@/lib/actions/availability"
 
 interface ProductDetailsProps {
   product: any
@@ -35,9 +36,54 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   })
   const [deliveryDate, setDeliveryDate] = useState<Date>()
   const [returnDate, setReturnDate] = useState<Date>()
+  const [availabilityError, setAvailabilityError] = useState<string>("")
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false)
 
   const { addItem } = useCart()
   const router = useRouter()
+
+  // Check if current user is the owner of this product
+  const isOwner = user && product?.owner_id === user.id
+  
+  // Debug logging
+  console.log("Product owner_id:", product?.owner_id)
+  console.log("Current user id:", user?.id)
+  console.log("Is owner:", isOwner)
+
+  // Check availability when dates change
+  useEffect(() => {
+    const checkAvailability = async () => {
+      if (!deliveryDate || !returnDate || !product?.id || !user?.id) {
+        setAvailabilityError("")
+        return
+      }
+
+      setIsCheckingAvailability(true)
+      setAvailabilityError("")
+
+      try {
+        const availability = await checkProductAvailability(
+          product.id,
+          deliveryDate.toISOString().split('T')[0],
+          returnDate.toISOString().split('T')[0],
+          user.id
+        )
+
+        if (!availability.isAvailable) {
+          setAvailabilityError(availability.reason || "Product not available for selected dates")
+        } else {
+          setAvailabilityError("")
+        }
+      } catch (error) {
+        console.error("Error checking availability:", error)
+        setAvailabilityError("Error checking availability")
+      } finally {
+        setIsCheckingAvailability(false)
+      }
+    }
+
+    checkAvailability()
+  }, [deliveryDate, returnDate, product?.id, user?.id])
 
   // Add null check for product
   if (!product) {
@@ -79,6 +125,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       toast.error("Please select rental dates")
       return
     }
+    if (availabilityError) {
+      toast.error(availabilityError)
+      return
+    }
 
     addItem({
       productId: product.id,
@@ -99,6 +149,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     if (!product?.id) return
     if (!deliveryDate || !returnDate) {
       toast.error("Please select rental dates")
+      return
+    }
+    if (availabilityError) {
+      toast.error(availabilityError)
       return
     }
 
@@ -263,6 +317,22 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             </div>
           </div>
 
+          {/* Availability Error Display */}
+          {availabilityError && (
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive text-sm font-medium">
+                {availabilityError}
+              </p>
+            </div>
+          )}
+
+          {/* Availability Loading */}
+          {isCheckingAvailability && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-600 text-sm">Checking availability...</p>
+            </div>
+          )}
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             {user && product.owner_id === user.id ? (
@@ -276,6 +346,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                   size="lg"
                   className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 text-lg py-6"
                   onClick={handleRentNow}
+                  disabled={!!availabilityError || isCheckingAvailability}
                 >
                   Rent Now
                 </Button>
@@ -284,6 +355,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                   variant="outline"
                   className="flex-1 text-lg py-6 bg-transparent"
                   onClick={handleAddToCart}
+                  disabled={!!availabilityError || isCheckingAvailability}
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Add to Cart
@@ -364,3 +436,4 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     </div>
   )
 }
+

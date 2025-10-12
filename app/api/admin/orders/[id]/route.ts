@@ -211,6 +211,30 @@ export async function PUT(
       `)
       .single()
 
+    // Update product availability based on order status
+    if (status && order) {
+      let productAvailable = true
+      
+      // If order is confirmed or in progress, make product unavailable
+      if (['confirmed', 'picked_up', 'dispatched', 'delivered', 'picked_up_for_return'].includes(status)) {
+        productAvailable = false
+      }
+      
+      // If order is completed or cancelled, make product available again
+      if (['completed', 'cancelled', 'rejected'].includes(status)) {
+        productAvailable = true
+      }
+
+      // Update product availability
+      await supabase
+        .from('products')
+        .update({ 
+          is_available: productAvailable,
+          availability_status: productAvailable ? 'available' : 'rented'
+        })
+        .eq('id', order.product_id)
+    }
+
     if (error) {
       console.error('Error updating order:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -220,21 +244,26 @@ export async function PUT(
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // Create admin notification for status change
+    // Create admin notification for status change (with error handling)
     if (status) {
-      await supabase.rpc('create_admin_notification', {
-        notification_type: 'order_status_change',
-        notification_title: `Order Status Updated`,
-        notification_message: `Order #${order.id.slice(0, 8)} status changed to "${status}"`,
-        notification_data: { 
-          order_id: params.id, 
-          order_number: order.id.slice(0, 8),
-          new_status: status,
-          customer_name: order.customer?.full_name,
-          product_title: order.products?.title
-        },
-        notification_priority: 'medium'
-      })
+      try {
+        await supabase.rpc('create_admin_notification', {
+          notification_type: 'order_status_change',
+          notification_title: `Order Status Updated`,
+          notification_message: `Order #${order.id.slice(0, 8)} status changed to "${status}"`,
+          notification_data: { 
+            order_id: params.id, 
+            order_number: order.id.slice(0, 8),
+            new_status: status,
+            customer_name: order.customer?.full_name,
+            product_title: order.products?.title
+          },
+          notification_priority: 'medium'
+        })
+      } catch (notificationError) {
+        console.warn('Failed to create admin notification:', notificationError)
+        // Don't fail the entire request if notification creation fails
+      }
     }
 
     return NextResponse.json({ order })
@@ -243,3 +272,4 @@ export async function PUT(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+

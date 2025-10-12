@@ -113,7 +113,6 @@ export async function PUT(
 
     const updateData: any = {
       status,
-      status_updated_by: user.id,
       updated_at: new Date().toISOString()
     }
 
@@ -169,14 +168,24 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    // Create admin notification
-    await supabase.rpc('create_admin_notification', {
-      notification_type: status === 'approved' ? 'product_approved' : 'product_rejected',
-      notification_title: `Product ${status === 'approved' ? 'Approved' : 'Rejected'}`,
-      notification_message: `Product "${product.title}" has been ${status === 'approved' ? 'approved' : 'rejected'}${rejection_reason ? ` - Reason: ${rejection_reason}` : ''}`,
-      notification_data: { product_id: params.id, product_title: product.title, owner_name: product.profiles?.full_name },
-      notification_priority: 'medium'
-    })
+    // Create admin notification (with error handling)
+    try {
+      const notificationType = status === 'approved' ? 'product_approved' : 'product_rejected'
+      
+      // Map to valid notification types from schema
+      const validType = notificationType === 'product_approved' ? 'new_product' : 'product_rejected'
+      
+      await supabase.rpc('create_admin_notification', {
+        notification_type: validType,
+        notification_title: `Product ${status === 'approved' ? 'Approved' : 'Rejected'}`,
+        notification_message: `Product "${product.title}" has been ${status === 'approved' ? 'approved' : 'rejected'}${rejection_reason ? ` - Reason: ${rejection_reason}` : ''}`,
+        notification_data: { product_id: params.id, product_title: product.title, owner_name: product.profiles?.full_name },
+        notification_priority: 'medium'
+      })
+    } catch (notificationError) {
+      console.warn('Failed to create admin notification:', notificationError)
+      // Don't fail the entire request if notification creation fails
+    }
 
     return NextResponse.json({ product })
   } catch (error) {
@@ -184,3 +193,4 @@ export async function PUT(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+

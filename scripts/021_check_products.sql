@@ -53,3 +53,7 @@ SELECT
     END as visibility_status
 FROM public.products
 ORDER BY created_at DESC;
+
+
+
+

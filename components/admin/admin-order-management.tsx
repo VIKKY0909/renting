@@ -96,16 +96,33 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
   const fetchOrders = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/admin/orders?status=${activeTab === 'all' ? '' : activeTab}`)
+      const url = `/api/admin/orders?status=${activeTab === 'all' ? '' : activeTab}`
+      console.log('[Admin Orders] Fetching orders from:', url)
+      
+      const response = await fetch(url)
       const data = await response.json()
+      
+      console.log('[Admin Orders] API Response:', {
+        status: response.status,
+        ok: response.ok,
+        ordersCount: data.orders?.length || 0,
+        data: data
+      })
+      
       if (response.ok) {
         setOrders(data.orders || [])
+        console.log('[Admin Orders] Orders loaded:', data.orders?.length || 0)
+        
+        if (!data.orders || data.orders.length === 0) {
+          console.warn('[Admin Orders] No orders found for status:', activeTab)
+        }
       } else {
-        toast.error('Failed to fetch orders')
+        console.error('[Admin Orders] API Error:', data)
+        toast.error(data.error || 'Failed to fetch orders')
       }
     } catch (error) {
-      console.error('Error fetching orders:', error)
-      toast.error('Error fetching orders')
+      console.error('[Admin Orders] Fetch error:', error)
+      toast.error('Error fetching orders. Check console for details.')
     } finally {
       setLoading(false)
     }
@@ -182,8 +199,11 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
     const stats = {
       pending: orders.filter(o => o.status === 'pending').length,
       confirmed: orders.filter(o => o.status === 'confirmed').length,
+      picked_up: orders.filter(o => o.status === 'picked_up').length,
       dispatched: orders.filter(o => o.status === 'dispatched').length,
       delivered: orders.filter(o => o.status === 'delivered').length,
+      picked_up_for_return: orders.filter(o => o.status === 'picked_up_for_return').length,
+      returned: orders.filter(o => o.status === 'returned').length,
       completed: orders.filter(o => o.status === 'completed').length,
       cancelled: orders.filter(o => o.status === 'cancelled').length,
       total: orders.length
@@ -224,10 +244,17 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
           <h2 className="font-serif text-2xl font-bold mb-2">Order Management</h2>
           <p className="text-muted-foreground">Track and manage rental orders</p>
         </div>
+        <Button 
+          variant="outline" 
+          onClick={fetchOrders}
+          disabled={loading}
+        >
+          {loading ? 'Refreshing...' : 'Refresh Orders'}
+        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      {/* Stats Cards - Complete Order Flow */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -253,6 +280,17 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
+              <Package className="h-4 w-4 text-orange-600" />
+              <div>
+                <p className="text-sm text-muted-foreground">Picked Up</p>
+                <p className="text-2xl font-bold">{stats.picked_up}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
               <Truck className="h-4 w-4 text-purple-600" />
               <div>
                 <p className="text-sm text-muted-foreground">Dispatched</p>
@@ -264,10 +302,32 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-green-600" />
+              <CheckCircle className="h-4 w-4 text-green-600" />
               <div>
                 <p className="text-sm text-muted-foreground">Delivered</p>
                 <p className="text-2xl font-bold">{stats.delivered}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <RotateCcw className="h-4 w-4 text-orange-600" />
+              <div>
+                <p className="text-sm text-muted-foreground">Return Pickup</p>
+                <p className="text-2xl font-bold">{stats.picked_up_for_return}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <RotateCcw className="h-4 w-4 text-blue-600" />
+              <div>
+                <p className="text-sm text-muted-foreground">Returned</p>
+                <p className="text-2xl font-bold">{stats.returned}</p>
               </div>
             </div>
           </CardContent>
@@ -303,14 +363,46 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="pending">Pending ({stats.pending})</TabsTrigger>
-              <TabsTrigger value="confirmed">Confirmed ({stats.confirmed})</TabsTrigger>
-              <TabsTrigger value="dispatched">Dispatched ({stats.dispatched})</TabsTrigger>
-              <TabsTrigger value="delivered">Delivered ({stats.delivered})</TabsTrigger>
-              <TabsTrigger value="completed">Completed ({stats.completed})</TabsTrigger>
-              <TabsTrigger value="all">All ({stats.total})</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 min-w-[600px]">
+                <TabsTrigger value="pending" className="text-xs sm:text-sm">
+                  <Clock className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Pending ({stats.pending})
+                </TabsTrigger>
+                <TabsTrigger value="confirmed" className="text-xs sm:text-sm">
+                  <CheckCircle className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Confirmed ({stats.confirmed})
+                </TabsTrigger>
+                <TabsTrigger value="picked_up" className="text-xs sm:text-sm">
+                  <Package className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Picked Up ({stats.picked_up})
+                </TabsTrigger>
+                <TabsTrigger value="dispatched" className="text-xs sm:text-sm">
+                  <Truck className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Dispatched ({stats.dispatched})
+                </TabsTrigger>
+                <TabsTrigger value="delivered" className="text-xs sm:text-sm">
+                  <CheckCircle className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Delivered ({stats.delivered})
+                </TabsTrigger>
+                <TabsTrigger value="picked_up_for_return" className="text-xs sm:text-sm">
+                  <RotateCcw className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Return Pickup ({stats.picked_up_for_return})
+                </TabsTrigger>
+                <TabsTrigger value="returned" className="text-xs sm:text-sm">
+                  <RotateCcw className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Returned ({stats.returned})
+                </TabsTrigger>
+                <TabsTrigger value="completed" className="text-xs sm:text-sm">
+                  <CheckCircle className="h-3 w-3 mr-1 hidden sm:inline" />
+                  Completed ({stats.completed})
+                </TabsTrigger>
+                <TabsTrigger value="all" className="text-xs sm:text-sm">
+                  <AlertTriangle className="h-3 w-3 mr-1 hidden sm:inline" />
+                  All ({stats.total})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value={activeTab} className="mt-6">
               <div className="space-y-4">
@@ -351,7 +443,7 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
                             {order.products?.title}
                           </p>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mb-4">
                             <div>
                               <p className="text-muted-foreground">Rental Period</p>
                               <p className="font-medium">
@@ -375,7 +467,7 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
                           </div>
 
                           {/* Customer & Owner Info */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                             <div className="p-3 bg-muted rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
@@ -457,15 +549,60 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
                 ))}
 
                 {orders.length === 0 && (
-                  <div className="text-center py-12">
-                    <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No orders found</h3>
-                    <p className="text-muted-foreground">
+                  <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                    <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">No orders found</h3>
+                    <p className="text-muted-foreground mb-6">
                       {activeTab === 'all' 
                         ? 'No orders have been placed yet.' 
                         : `No orders with status "${activeTab}" found.`
                       }
                     </p>
+                    
+                    {activeTab === 'all' && (
+                      <div className="max-w-md mx-auto space-y-4">
+                        <div className="bg-muted p-4 rounded-lg text-left">
+                          <h4 className="font-semibold mb-2">To test orders:</h4>
+                          <ol className="text-sm space-y-1 list-decimal list-inside">
+                            <li>Login as a regular user (not admin)</li>
+                            <li>Add a delivery address in profile</li>
+                            <li>Browse products and place an order</li>
+                            <li>Return here to manage the order</li>
+                          </ol>
+                        </div>
+                        
+                        <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg text-left">
+                          <h4 className="font-semibold mb-2 text-blue-900">Database Check:</h4>
+                          <p className="text-sm text-blue-800 mb-2">
+                            Run this in Supabase SQL Editor:
+                          </p>
+                          <code className="text-xs bg-blue-100 p-2 rounded block">
+                            SELECT COUNT(*) FROM orders;
+                          </code>
+                          <p className="text-xs text-blue-700 mt-2">
+                            If this returns 0, no orders exist in database.
+                          </p>
+                        </div>
+                        
+                        <Button variant="outline" onClick={fetchOrders}>
+                          Refresh Orders
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {activeTab !== 'all' && (
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Try viewing all orders instead:
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setActiveTab('all')}
+                        >
+                          View All Orders
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -677,3 +814,4 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
     </div>
   )
 }
+

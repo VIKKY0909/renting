@@ -34,7 +34,12 @@ export function AdminOverview() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const statsData = await getAdminStats()
+        const response = await getAdminStats()
+        console.log("[Admin Overview] Stats response:", response)
+        
+        // Handle both response formats
+        const statsData = response?.stats || response
+        
         setStats(statsData || {
           totalRevenue: 0,
           activeUsers: 0,

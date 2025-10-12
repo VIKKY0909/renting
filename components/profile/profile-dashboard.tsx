@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Package, Shirt, DollarSign, Settings, CreditCard, LogOut, Loader2 } from "lucide-react"
+import { Package, Shirt, DollarSign, Settings, CreditCard, LogOut, Loader2, MapPin } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MyOrders } from "@/components/profile/my-orders"
 import { MyDresses } from "@/components/profile/my-dresses"
 import { MyEarnings } from "@/components/profile/my-earnings"
 import { ProfileSettings } from "@/components/profile/profile-settings"
 import { BankDetails } from "@/components/profile/bank-details"
+import { AddressManagement } from "@/components/profile/address-management"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
@@ -75,7 +76,7 @@ export function ProfileDashboard() {
 
       {/* Dashboard Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-muted h-auto">
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-muted h-auto">
           <TabsTrigger value="orders" className="flex items-center gap-2 py-3">
             <Package className="h-4 w-4" />
             <span className="hidden sm:inline">My Orders</span>
@@ -83,6 +84,10 @@ export function ProfileDashboard() {
           <TabsTrigger value="dresses" className="flex items-center gap-2 py-3">
             <Shirt className="h-4 w-4" />
             <span className="hidden sm:inline">My Dresses</span>
+          </TabsTrigger>
+          <TabsTrigger value="addresses" className="flex items-center gap-2 py-3">
+            <MapPin className="h-4 w-4" />
+            <span className="hidden sm:inline">Addresses</span>
           </TabsTrigger>
           <TabsTrigger value="earnings" className="flex items-center gap-2 py-3">
             <DollarSign className="h-4 w-4" />
@@ -104,6 +109,10 @@ export function ProfileDashboard() {
 
         <TabsContent value="dresses" className="mt-8">
           <MyDresses />
+        </TabsContent>
+
+        <TabsContent value="addresses" className="mt-8">
+          <AddressManagement />
         </TabsContent>
 
         <TabsContent value="earnings" className="mt-8">

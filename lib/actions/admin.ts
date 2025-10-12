@@ -10,11 +10,15 @@ async function checkAdminAccess() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  console.log("checkAdminAccess - User:", user?.id)
+
   if (!user) {
     return { isAdmin: false, user: null }
   }
 
   const { data: profile } = await supabase.from("profiles").select("is_admin").eq("id", user.id).single()
+
+  console.log("checkAdminAccess - Profile is_admin:", profile?.is_admin)
 
   return { isAdmin: profile?.is_admin || false, user }
 }
@@ -22,55 +26,121 @@ async function checkAdminAccess() {
 export async function getAdminStats() {
   const { isAdmin } = await checkAdminAccess()
 
+  console.log("[getAdminStats] Admin access check:", isAdmin)
+
   if (!isAdmin) {
-    return { stats: null, error: "Unauthorized" }
+    return {
+      totalRevenue: 0,
+      activeUsers: 0,
+      totalProducts: 0,
+      ordersThisMonth: 0,
+      averageRating: 0,
+      pendingReviews: 0,
+      revenueChange: 0,
+      usersChange: 0,
+      productsChange: 0,
+      ordersChange: 0,
+      ratingChange: 0,
+      reviewsChange: 0,
+    }
   }
 
   const supabase = await createClient()
 
-  // Get counts with optimized queries
-  const [
-    { count: totalUsers },
-    { count: totalProducts },
-    { count: pendingProducts },
-    { count: totalOrders },
-    { count: activeOrders },
-    { count: totalReviews },
-    { count: pendingReviews },
-  ] = await Promise.all([
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase.from("products").select("id", { count: "exact", head: true }),
-    supabase.from("products").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("orders").select("id", { count: "exact", head: true }),
-    supabase
+  try {
+    // Get counts with optimized queries
+    const [
+      { count: totalUsers },
+      { count: totalProducts },
+      { count: pendingProducts },
+      { count: totalOrders },
+      { count: activeOrders },
+      { count: totalReviews },
+      { count: pendingReviews },
+    ] = await Promise.all([
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      supabase.from("products").select("id", { count: "exact", head: true }),
+      supabase.from("products").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      supabase.from("orders").select("id", { count: "exact", head: true }),
+      supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .in("status", ["pending", "confirmed", "dispatched", "delivered"]),
+      supabase.from("reviews").select("id", { count: "exact", head: true }),
+      supabase.from("reviews").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    ])
+
+    // Get revenue from completed orders
+    const { data: completedOrders, error: revenueError } = await supabase
+      .from("orders")
+      .select("total_amount, security_deposit")
+      .eq("status", "completed")
+      .limit(1000)
+
+    if (revenueError) {
+      console.error("[getAdminStats] Error fetching revenue:", revenueError)
+    }
+
+    // Calculate total revenue (rental_price only, not security deposit)
+    const totalRevenue = completedOrders?.reduce((sum, order) => {
+      const amount = Number(order.total_amount) - Number(order.security_deposit || 0)
+      return sum + amount
+    }, 0) || 0
+
+    // Get orders this month
+    const currentMonth = new Date()
+    currentMonth.setDate(1)
+    currentMonth.setHours(0, 0, 0, 0)
+
+    const { count: ordersThisMonth } = await supabase
       .from("orders")
       .select("id", { count: "exact", head: true })
-      .in("status", ["pending", "confirmed", "shipped", "delivered"]),
-    supabase.from("reviews").select("id", { count: "exact", head: true }),
-    supabase.from("reviews").select("id", { count: "exact", head: true }).eq("status", "pending"),
-  ])
+      .gte("created_at", currentMonth.toISOString())
 
-  // Get revenue with optimized query
-  const { data: orders } = await supabase
-    .from("orders")
-    .select("total_amount")
-    .eq("status", "completed")
-    .limit(1000) // Limit to prevent large data transfer
+    // Get average rating from products
+    const { data: products } = await supabase
+      .from("products")
+      .select("average_rating")
+      .gt("average_rating", 0)
 
-  const totalRevenue = orders?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
+    const averageRating = products && products.length > 0
+      ? products.reduce((sum, p) => sum + (Number(p.average_rating) || 0), 0) / products.length
+      : 0
 
-  return {
-    stats: {
-      totalUsers: totalUsers || 0,
+    const stats = {
+      totalRevenue: Math.round(totalRevenue),
+      activeUsers: totalUsers || 0,
       totalProducts: totalProducts || 0,
-      pendingProducts: pendingProducts || 0,
-      totalOrders: totalOrders || 0,
-      activeOrders: activeOrders || 0,
-      totalReviews: totalReviews || 0,
+      ordersThisMonth: ordersThisMonth || 0,
+      averageRating: Math.round(averageRating * 10) / 10,
       pendingReviews: pendingReviews || 0,
-      totalRevenue,
-    },
-    error: null,
+      revenueChange: 0, // TODO: Calculate month-over-month change
+      usersChange: 0,
+      productsChange: 0,
+      ordersChange: 0,
+      ratingChange: 0,
+      reviewsChange: 0,
+    }
+
+    console.log("[getAdminStats] Calculated stats:", stats)
+
+    return stats
+  } catch (error) {
+    console.error("[getAdminStats] Error:", error)
+    return {
+      totalRevenue: 0,
+      activeUsers: 0,
+      totalProducts: 0,
+      ordersThisMonth: 0,
+      averageRating: 0,
+      pendingReviews: 0,
+      revenueChange: 0,
+      usersChange: 0,
+      productsChange: 0,
+      ordersChange: 0,
+      ratingChange: 0,
+      reviewsChange: 0,
+    }
   }
 }
 
@@ -203,6 +273,8 @@ export async function rejectProduct(productId: string) {
 export async function getAllOrders(filters?: { status?: string; search?: string; limit?: number; offset?: number }) {
   const { isAdmin } = await checkAdminAccess()
 
+  console.log("getAllOrders - isAdmin:", isAdmin)
+
   if (!isAdmin) {
     return { orders: [], count: 0, error: "Unauthorized" }
   }
@@ -244,6 +316,7 @@ export async function getAllOrders(filters?: { status?: string; search?: string;
     return { orders: [], count: 0, error: error.message }
   }
 
+  console.log("getAllOrders - Found orders:", data?.length || 0, "Total count:", count || 0)
   return { orders: data || [], count: count || 0, error: null }
 }
 

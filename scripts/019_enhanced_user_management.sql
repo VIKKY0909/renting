@@ -250,3 +250,7 @@ COMMENT ON FUNCTION log_user_activity IS 'Logs user activity with optional metad
 COMMENT ON FUNCTION get_recent_activity IS 'Gets recent user activities for admin dashboard';
 COMMENT ON FUNCTION is_super_admin IS 'Checks if user is a super admin';
 COMMENT ON FUNCTION is_admin_or_super_admin IS 'Checks if user is admin or super admin';
+
+
+
+

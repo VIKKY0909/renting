@@ -6,12 +6,28 @@ import { revalidatePath } from "next/cache"
 export async function createOrder(formData: FormData) {
   const supabase = await createClient()
 
+  console.log("[Order Creation] Starting order creation process...")
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  console.log("[Order Creation] User authenticated:", user?.id)
+
   if (!user) {
+    console.error("[Order Creation] FAILED: No user authenticated")
     return { success: false, error: "Unauthorized" }
+  }
+
+  // Check if user has an address
+  const { checkUserHasAddress } = await import("./addresses")
+  const { hasAddress } = await checkUserHasAddress()
+  
+  console.log("[Order Creation] Address check:", hasAddress)
+  
+  if (!hasAddress) {
+    console.error("[Order Creation] FAILED: User has no address")
+    return { success: false, error: "Please add a delivery address before placing an order" }
   }
 
   const productId = formData.get("product_id") as string
@@ -19,6 +35,8 @@ export async function createOrder(formData: FormData) {
   const rentalEndDate = formData.get("rental_end_date") as string
   const selectedSize = formData.get("selected_size") as string
   const paymentMethod = formData.get("payment_method") as string || "card"
+
+  console.log("[Order Creation] Order params:", { productId, rentalStartDate, rentalEndDate, selectedSize, paymentMethod })
 
   // Get product details
   const { data: product, error: productError } = await supabase
@@ -28,18 +46,34 @@ export async function createOrder(formData: FormData) {
     .single()
 
   if (productError || !product) {
+    console.error("[Order Creation] FAILED: Product not found", productError)
     return { success: false, error: "Product not found" }
   }
 
-  // Check availability
-  const { data: isAvailable } = await supabase.rpc("check_product_availability", {
-    product_id: productId,
-    start_date: rentalStartDate,
-    end_date: rentalEndDate,
+  console.log("[Order Creation] Product details:", { 
+    productId: product.id, 
+    title: product.title,
+    ownerId: product.owner.id,
+    rentalPrice: product.rental_price,
+    securityDeposit: product.security_deposit
   })
 
-  if (!isAvailable) {
-    return { success: false, error: "Product is not available for selected dates" }
+  // Prevent users from renting their own products
+  console.log("[Order Creation] Ownership check - User:", user.id, "Owner:", product.owner.id)
+  if (product.owner.id === user.id) {
+    console.error("[Order Creation] BLOCKED: User trying to rent their own product")
+    return { success: false, error: "You cannot rent your own products" }
+  }
+
+  // Check availability using our custom function
+  const { checkProductAvailability } = await import("./availability")
+  const availability = await checkProductAvailability(productId, rentalStartDate, rentalEndDate, user.id)
+
+  console.log("[Order Creation] Availability check:", availability)
+
+  if (!availability.isAvailable) {
+    console.error("[Order Creation] FAILED: Product not available", availability.reason)
+    return { success: false, error: availability.reason || "Product is not available for selected dates" }
   }
 
   // Calculate rental days
@@ -70,12 +104,22 @@ export async function createOrder(formData: FormData) {
     payment_method: paymentMethod,
   }
 
+  console.log("[Order Creation] Order data to insert:", orderData)
+
   const { data, error } = await supabase.from("orders").insert(orderData).select().single()
 
   if (error) {
-    console.error("[v0] Error creating order:", error)
+    console.error("[Order Creation] FAILED: Database insert error", error)
+    console.error("[Order Creation] Error details:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    })
     return { success: false, error: error.message }
   }
+
+  console.log("[Order Creation] SUCCESS: Order created", data.id)
 
   revalidatePath("/profile/orders")
   return { success: true, order: data }
@@ -84,79 +128,160 @@ export async function createOrder(formData: FormData) {
 export async function createMultiItemOrder(formData: FormData) {
   const supabase = await createClient()
 
+  console.log("[Multi-Item Order] Starting order creation process...")
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  console.log("[Multi-Item Order] User authenticated:", user?.id)
+
   if (!user) {
+    console.error("[Multi-Item Order] FAILED: No user authenticated")
     return { success: false, error: "Unauthorized" }
   }
 
-  const itemCount = parseInt(formData.get("itemCount") as string)
+  // Get delivery address ID
+  const deliveryAddressId = formData.get("delivery_address_id") as string
+  console.log("[Multi-Item Order] Delivery address ID:", deliveryAddressId)
+
+  if (!deliveryAddressId) {
+    console.error("[Multi-Item Order] FAILED: No delivery address selected")
+    return { success: false, error: "Please select a delivery address" }
+  }
+
+  // Verify address belongs to user
+  const { data: addressCheck, error: addressError } = await supabase
+    .from("user_addresses")
+    .select("id")
+    .eq("id", deliveryAddressId)
+    .eq("user_id", user.id)
+    .single()
+
+  if (addressError || !addressCheck) {
+    console.error("[Multi-Item Order] FAILED: Invalid address", addressError)
+    return { success: false, error: "Invalid delivery address" }
+  }
+
+  console.log("[Multi-Item Order] Address verified ✓")
+
+  // Parse items from JSON
+  const itemsJson = formData.get("items") as string
   const paymentMethod = formData.get("payment_method") as string || "card"
-  const totalAmount = Number.parseFloat(formData.get("total_amount") as string)
+  
+  console.log("[Multi-Item Order] Payment method:", paymentMethod)
+  console.log("[Multi-Item Order] Items JSON:", itemsJson)
+
+  let items: any[]
+  try {
+    items = JSON.parse(itemsJson)
+    console.log("[Multi-Item Order] Parsed items count:", items.length)
+  } catch (e) {
+    console.error("[Multi-Item Order] FAILED: Invalid items data", e)
+    return { success: false, error: "Invalid order data" }
+  }
+
+  if (!items || items.length === 0) {
+    console.error("[Multi-Item Order] FAILED: No items in order")
+    return { success: false, error: "No items in order" }
+  }
 
   const ordersToInsert = []
 
-  for (let i = 0; i < itemCount; i++) {
-    const productId = formData.get(`item_${i}_productId`) as string
-    const rentalStartDate = formData.get(`item_${i}_rentalStartDate`) as string
-    const rentalEndDate = formData.get(`item_${i}_rentalEndDate`) as string
-    const selectedSize = formData.get(`item_${i}_selectedSize`) as string
-    const rentalPricePerItem = Number.parseFloat(formData.get(`item_${i}_rentalPrice`) as string)
-    const securityDepositPerItem = Number.parseFloat(formData.get(`item_${i}_securityDeposit`) as string)
-    const rentalDays = parseInt(formData.get(`item_${i}_rentalDays`) as string)
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    console.log(`[Multi-Item Order] Processing item ${i + 1}/${items.length}:`, {
+      productId: item.productId,
+      title: item.title,
+      rentalDays: item.rentalDays
+    })
 
     // Get product details
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("*, owner:profiles!products_owner_id_fkey(id)")
-      .eq("id", productId)
+      .eq("id", item.productId)
       .single()
 
     if (productError || !product) {
-      return { success: false, error: `Product not found for item ${i + 1}` }
+      console.error(`[Multi-Item Order] FAILED: Product not found for item ${i + 1}`, productError)
+      return { success: false, error: `Product "${item.title}" not found` }
     }
 
-    // Check availability
-    const { data: isAvailable } = await supabase.rpc("check_product_availability", {
-      product_id: productId,
-      start_date: rentalStartDate,
-      end_date: rentalEndDate,
-    })
+    console.log(`[Multi-Item Order] Product details - Owner: ${product.owner.id}, Price: ${product.rental_price}`)
 
-    if (!isAvailable) {
-      return { success: false, error: `Product "${product.title}" is not available for selected dates` }
+    // Prevent users from renting their own products
+    if (product.owner.id === user.id) {
+      console.error(`[Multi-Item Order] BLOCKED: User trying to rent own product: ${product.title}`)
+      return { success: false, error: `You cannot rent your own product: "${product.title}"` }
+    }
+
+    // Check availability using our custom function
+    const { checkProductAvailability } = await import("./availability")
+    const availability = await checkProductAvailability(
+      item.productId,
+      item.rentalStartDate,
+      item.rentalEndDate,
+      user.id
+    )
+
+    console.log(`[Multi-Item Order] Availability check for ${product.title}:`, availability)
+
+    if (!availability.isAvailable) {
+      console.error(`[Multi-Item Order] FAILED: Product not available - ${product.title}`, availability.reason)
+      return { 
+        success: false, 
+        error: `Product "${product.title}" - ${availability.reason || "not available for selected dates"}` 
+      }
     }
 
     // Calculate total for this item
-    const itemRentalPrice = rentalPricePerItem * rentalDays
-    const itemTotalAmount = itemRentalPrice + securityDepositPerItem
+    const itemRentalPrice = item.rentalPrice
+    const itemTotalAmount = item.rentalPrice + item.securityDeposit
+
+    console.log(`[Multi-Item Order] Order item ${i + 1} prepared:`, {
+      rentalPrice: itemRentalPrice,
+      securityDeposit: item.securityDeposit,
+      total: itemTotalAmount
+    })
 
     ordersToInsert.push({
       user_id: user.id,
-      product_id: productId,
+      product_id: item.productId,
       owner_id: product.owner.id,
-      rental_start_date: rentalStartDate,
-      rental_end_date: rentalEndDate,
-      rental_days: rentalDays,
+      rental_start_date: item.rentalStartDate,
+      rental_end_date: item.rentalEndDate,
+      rental_days: item.rentalDays,
       rental_price: itemRentalPrice,
-      security_deposit: securityDepositPerItem,
+      security_deposit: item.securityDeposit,
       discount: 0,
       total_amount: itemTotalAmount,
-      selected_size: selectedSize,
+      selected_size: item.selectedSize,
       status: "pending",
       payment_status: "paid",
       payment_method: paymentMethod,
+      delivery_address_id: deliveryAddressId, // ← CRITICAL FIX: Added this!
     })
   }
+
+  console.log(`[Multi-Item Order] Attempting to insert ${ordersToInsert.length} orders...`)
+  console.log("[Multi-Item Order] Order data sample:", JSON.stringify(ordersToInsert[0], null, 2))
 
   const { data, error } = await supabase.from("orders").insert(ordersToInsert).select()
 
   if (error) {
-    console.error("[v0] Error creating order:", error)
+    console.error("[Multi-Item Order] DATABASE ERROR:", error)
+    console.error("[Multi-Item Order] Error details:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    })
     return { success: false, error: error.message }
   }
+
+  console.log("[Multi-Item Order] ✓✓✓ SUCCESS! Orders created:", data?.length)
+  console.log("[Multi-Item Order] Order IDs:", data?.map(o => o.id))
 
   revalidatePath("/profile/orders")
   return { success: true, orders: data }
@@ -168,6 +293,8 @@ export async function getUserOrders() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  console.log("getUserOrders - User:", user?.id)
 
   if (!user) {
     return { orders: [], error: "Unauthorized" }
@@ -195,6 +322,7 @@ export async function getUserOrders() {
     return { orders: [], error: error.message }
   }
 
+  console.log("getUserOrders - Found orders:", data?.length || 0)
   return { orders: data || [], error: null }
 }
 

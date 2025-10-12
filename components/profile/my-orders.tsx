@@ -20,14 +20,23 @@ interface Order {
   status: string
   rental_start_date: string
   rental_end_date: string
+  rental_days: number
+  total_amount: number
+  payment_status: string
   created_at: string
 }
 
 const statusConfig = {
-  "in-transit": { label: "In Transit", icon: Truck, color: "bg-blue-500" },
-  delivered: { label: "Delivered", icon: Package, color: "bg-green-500" },
-  completed: { label: "Completed", icon: CheckCircle, color: "bg-gray-500" },
   pending: { label: "Pending", icon: Package, color: "bg-yellow-500" },
+  confirmed: { label: "Confirmed", icon: CheckCircle, color: "bg-blue-500" },
+  picked_up: { label: "Picked Up", icon: Truck, color: "bg-orange-500" },
+  dispatched: { label: "Dispatched", icon: Truck, color: "bg-purple-500" },
+  delivered: { label: "Delivered", icon: Package, color: "bg-green-500" },
+  picked_up_for_return: { label: "Picked Up for Return", icon: Truck, color: "bg-orange-500" },
+  returned: { label: "Returned", icon: CheckCircle, color: "bg-blue-500" },
+  completed: { label: "Completed", icon: CheckCircle, color: "bg-gray-500" },
+  cancelled: { label: "Cancelled", icon: Package, color: "bg-red-500" },
+  rejected: { label: "Rejected", icon: Package, color: "bg-red-500" },
 }
 
 export function MyOrders() {

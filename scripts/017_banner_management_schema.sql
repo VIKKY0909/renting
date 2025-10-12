@@ -232,3 +232,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Grant execute permission on the function
 GRANT EXECUTE ON FUNCTION get_banners_by_category(TEXT) TO anon, authenticated;
+
+
+
+

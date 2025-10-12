@@ -1,6 +1,37 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.admin_dashboard_stats (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  stat_date date NOT NULL UNIQUE,
+  total_products integer DEFAULT 0,
+  pending_products integer DEFAULT 0,
+  approved_products integer DEFAULT 0,
+  rejected_products integer DEFAULT 0,
+  total_orders integer DEFAULT 0,
+  pending_orders integer DEFAULT 0,
+  confirmed_orders integer DEFAULT 0,
+  completed_orders integer DEFAULT 0,
+  cancelled_orders integer DEFAULT 0,
+  total_revenue numeric DEFAULT 0,
+  pending_payments numeric DEFAULT 0,
+  total_users integer DEFAULT 0,
+  active_users integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_dashboard_stats_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.admin_notifications (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  type text NOT NULL CHECK (type = ANY (ARRAY['new_product'::text, 'new_order'::text, 'order_status_change'::text, 'payment_received'::text, 'product_rejected'::text, 'system_alert'::text])),
+  title text NOT NULL,
+  message text NOT NULL,
+  data jsonb,
+  is_read boolean DEFAULT false,
+  priority text DEFAULT 'medium'::text CHECK (priority = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'urgent'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  read_at timestamp with time zone,
+  CONSTRAINT admin_notifications_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.bank_details (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid NOT NULL UNIQUE,
@@ -47,6 +78,44 @@ CREATE TABLE public.faqs (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT faqs_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.inventory_tracking (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  product_id uuid NOT NULL,
+  status text NOT NULL CHECK (status = ANY (ARRAY['available'::text, 'rented'::text, 'maintenance'::text, 'damaged'::text, 'lost'::text])),
+  order_id uuid,
+  notes text,
+  changed_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT inventory_tracking_pkey PRIMARY KEY (id),
+  CONSTRAINT inventory_tracking_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
+  CONSTRAINT inventory_tracking_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id),
+  CONSTRAINT inventory_tracking_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.order_items (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  order_id uuid NOT NULL,
+  product_id uuid NOT NULL,
+  quantity integer DEFAULT 1,
+  rental_price numeric NOT NULL,
+  security_deposit numeric NOT NULL,
+  discount numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT order_items_pkey PRIMARY KEY (id),
+  CONSTRAINT order_items_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id),
+  CONSTRAINT order_items_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+);
+CREATE TABLE public.order_status_history (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  order_id uuid NOT NULL,
+  status text NOT NULL,
+  payment_status text,
+  notes text,
+  updated_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT order_status_history_pkey PRIMARY KEY (id),
+  CONSTRAINT order_status_history_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id),
+  CONSTRAINT order_status_history_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.profiles(id)
+);
 CREATE TABLE public.orders (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   user_id uuid NOT NULL,
@@ -60,15 +129,60 @@ CREATE TABLE public.orders (
   discount numeric DEFAULT 0,
   total_amount numeric NOT NULL,
   selected_size text,
-  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'shipped'::text, 'delivered'::text, 'returned'::text, 'completed'::text, 'cancelled'::text])),
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'picked_up'::text, 'dispatched'::text, 'delivered'::text, 'picked_up_for_return'::text, 'returned'::text, 'completed'::text, 'cancelled'::text, 'rejected'::text])),
   payment_status text DEFAULT 'pending'::text CHECK (payment_status = ANY (ARRAY['pending'::text, 'paid'::text, 'refunded'::text])),
   tracking_number text,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  payment_method text DEFAULT 'card'::text,
+  admin_notes text,
+  customer_notes text,
+  pickup_address text,
+  delivery_address text,
+  pickup_scheduled_date timestamp with time zone,
+  delivery_scheduled_date timestamp with time zone,
+  return_scheduled_date timestamp with time zone,
+  actual_pickup_date timestamp with time zone,
+  actual_delivery_date timestamp with time zone,
+  actual_return_date timestamp with time zone,
+  shipping_cost numeric DEFAULT 0,
+  late_fee numeric DEFAULT 0,
+  damage_fee numeric DEFAULT 0,
+  final_amount numeric,
+  refund_amount numeric DEFAULT 0,
+  status_updated_by uuid,
+  status_updated_at timestamp with time zone,
   CONSTRAINT orders_pkey PRIMARY KEY (id),
   CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
   CONSTRAINT orders_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
-  CONSTRAINT orders_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
+  CONSTRAINT orders_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
+  CONSTRAINT orders_status_updated_by_fkey FOREIGN KEY (status_updated_by) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.payment_transactions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  order_id uuid NOT NULL,
+  transaction_id text UNIQUE,
+  amount numeric NOT NULL,
+  type text NOT NULL CHECK (type = ANY (ARRAY['rental'::text, 'security_deposit'::text, 'shipping'::text, 'late_fee'::text, 'damage_fee'::text, 'refund'::text])),
+  status text NOT NULL CHECK (status = ANY (ARRAY['pending'::text, 'processing'::text, 'completed'::text, 'failed'::text, 'refunded'::text])),
+  payment_method text,
+  gateway_response jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT payment_transactions_pkey PRIMARY KEY (id),
+  CONSTRAINT payment_transactions_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.orders(id)
+);
+CREATE TABLE public.product_status_history (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  product_id uuid NOT NULL,
+  status text NOT NULL,
+  reason text,
+  notes text,
+  updated_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT product_status_history_pkey PRIMARY KEY (id),
+  CONSTRAINT product_status_history_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
+  CONSTRAINT product_status_history_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.products (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -89,19 +203,34 @@ CREATE TABLE public.products (
   waist numeric,
   hip numeric,
   length numeric,
-  sleeve_length numeric,
+  sleeve_length text CHECK (sleeve_length = ANY (ARRAY['sleeveless'::text, 'short'::text, '3/4'::text, 'full'::text])),
   shoulder numeric,
   images ARRAY DEFAULT '{}'::text[],
-  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'unavailable'::text])),
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'under_review'::text, 'approved'::text, 'rejected'::text, 'suspended'::text, 'unavailable'::text])),
   is_available boolean DEFAULT true,
   views integer DEFAULT 0,
   total_rentals integer DEFAULT 0,
   average_rating numeric DEFAULT 0,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  condition text DEFAULT 'good'::text CHECK (condition IS NULL OR (condition = ANY (ARRAY['new'::text, 'excellent'::text, 'good'::text, 'fair'::text]))),
+  available_from date,
+  available_until date,
+  rejection_reason text,
+  admin_notes text,
+  approved_by uuid,
+  approved_at timestamp with time zone,
+  rejected_by uuid,
+  rejected_at timestamp with time zone,
+  condition_details text,
+  care_instructions text,
+  size_guide text,
+  availability_status text DEFAULT 'available'::text CHECK (availability_status = ANY (ARRAY['available'::text, 'rented'::text, 'maintenance'::text, 'unavailable'::text])),
   CONSTRAINT products_pkey PRIMARY KEY (id),
   CONSTRAINT products_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id),
-  CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id)
+  CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id),
+  CONSTRAINT products_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES public.profiles(id),
+  CONSTRAINT products_rejected_by_fkey FOREIGN KEY (rejected_by) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.profiles (
   id uuid NOT NULL,
@@ -146,6 +275,25 @@ CREATE TABLE public.testimonials (
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT testimonials_pkey PRIMARY KEY (id),
   CONSTRAINT testimonials_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.user_addresses (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL,
+  address_type text NOT NULL DEFAULT 'home'::text CHECK (address_type = ANY (ARRAY['home'::text, 'work'::text, 'other'::text])),
+  is_default boolean DEFAULT false,
+  full_name text NOT NULL,
+  phone text NOT NULL,
+  address_line_1 text NOT NULL,
+  address_line_2 text,
+  city text NOT NULL,
+  state text NOT NULL,
+  pincode text NOT NULL,
+  landmark text,
+  instructions text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_addresses_pkey PRIMARY KEY (id),
+  CONSTRAINT user_addresses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.wishlist (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -378,107 +526,6 @@ CREATE TABLE auth.users (
   is_anonymous boolean NOT NULL DEFAULT false,
   CONSTRAINT users_pkey PRIMARY KEY (id)
 );
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
-CREATE TABLE vault.secrets (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  name text,
-  description text NOT NULL DEFAULT ''::text,
-  secret text NOT NULL,
-  key_id uuid,
-  nonce bytea DEFAULT vault._crypto_aead_det_noncegen(),
-  created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT secrets_pkey PRIMARY KEY (id)
-);
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
-CREATE TABLE storage.buckets (
-  id text NOT NULL,
-  name text NOT NULL,
-  owner uuid,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  public boolean DEFAULT false,
-  avif_autodetection boolean DEFAULT false,
-  file_size_limit bigint,
-  allowed_mime_types ARRAY,
-  owner_id text,
-  type USER-DEFINED NOT NULL DEFAULT 'STANDARD'::storage.buckettype,
-  CONSTRAINT buckets_pkey PRIMARY KEY (id)
-);
-CREATE TABLE storage.buckets_analytics (
-  id text NOT NULL,
-  type USER-DEFINED NOT NULL DEFAULT 'ANALYTICS'::storage.buckettype,
-  format text NOT NULL DEFAULT 'ICEBERG'::text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT buckets_analytics_pkey PRIMARY KEY (id)
-);
-CREATE TABLE storage.migrations (
-  id integer NOT NULL,
-  name character varying NOT NULL UNIQUE,
-  hash character varying NOT NULL,
-  executed_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT migrations_pkey PRIMARY KEY (id)
-);
-CREATE TABLE storage.objects (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  bucket_id text,
-  name text,
-  owner uuid,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  last_accessed_at timestamp with time zone DEFAULT now(),
-  metadata jsonb,
-  path_tokens ARRAY DEFAULT string_to_array(name, '/'::text),
-  version text,
-  owner_id text,
-  user_metadata jsonb,
-  level integer,
-  CONSTRAINT objects_pkey PRIMARY KEY (id),
-  CONSTRAINT objects_bucketId_fkey FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)
-);
-CREATE TABLE storage.prefixes (
-  bucket_id text NOT NULL,
-  name text NOT NULL,
-  level integer NOT NULL DEFAULT storage.get_level(name),
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT prefixes_pkey PRIMARY KEY (bucket_id, name, level),
-  CONSTRAINT prefixes_bucketId_fkey FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)
-);
-CREATE TABLE storage.s3_multipart_uploads (
-  id text NOT NULL,
-  in_progress_size bigint NOT NULL DEFAULT 0,
-  upload_signature text NOT NULL,
-  bucket_id text NOT NULL,
-  key text NOT NULL,
-  version text NOT NULL,
-  owner_id text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  user_metadata jsonb,
-  CONSTRAINT s3_multipart_uploads_pkey PRIMARY KEY (id),
-  CONSTRAINT s3_multipart_uploads_bucket_id_fkey FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)
-);
-CREATE TABLE storage.s3_multipart_uploads_parts (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  upload_id text NOT NULL,
-  size bigint NOT NULL DEFAULT 0,
-  part_number integer NOT NULL,
-  bucket_id text NOT NULL,
-  key text NOT NULL,
-  etag text NOT NULL,
-  owner_id text,
-  version text NOT NULL,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT s3_multipart_uploads_parts_pkey PRIMARY KEY (id),
-  CONSTRAINT s3_multipart_uploads_parts_upload_id_fkey FOREIGN KEY (upload_id) REFERENCES storage.s3_multipart_uploads(id),
-  CONSTRAINT s3_multipart_uploads_parts_bucket_id_fkey FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)
-);
-
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 

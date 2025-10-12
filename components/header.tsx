@@ -47,13 +47,15 @@ export const Header = memo(function Header() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 transition-all duration-300 hover:opacity-90 animate-logo-glow">
-            <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Colour%20Logo%20With%20Black%20BG-tkgKC6mQgEtBgSkwsc6O0LPOZiRJsS.png"
-              alt="Rentimade"
-              width={120}
-              height={40}
-              className="h-10 w-auto transition-transform duration-300 hover:scale-105"
-            />
+            <span className="rounded-full bg-background/80 shadow-lg p-1 border border-border overflow-hidden flex items-center justify-center">
+              <Image
+                src={require("@/public/logo.png")}
+                alt="Rentimade"
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-full object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
