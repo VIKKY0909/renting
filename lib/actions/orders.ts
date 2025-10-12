@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { isValidPincode, getCityFromPincode } from "@/lib/utils/pincode-validation"
 
 export async function createOrder(formData: FormData) {
   const supabase = await createClient()
@@ -19,15 +20,65 @@ export async function createOrder(formData: FormData) {
     return { success: false, error: "Unauthorized" }
   }
 
-  // Check if user has an address
-  const { checkUserHasAddress } = await import("./addresses")
-  const { hasAddress } = await checkUserHasAddress()
+  // Get delivery address ID from form data
+  const deliveryAddressId = formData.get("delivery_address_id") as string
+  console.log("[Order Creation] Delivery address ID:", deliveryAddressId)
+
+  let deliveryAddress = null
   
-  console.log("[Order Creation] Address check:", hasAddress)
-  
-  if (!hasAddress) {
-    console.error("[Order Creation] FAILED: User has no address")
-    return { success: false, error: "Please add a delivery address before placing an order" }
+  if (deliveryAddressId) {
+    // Get specific delivery address
+    const { data: address, error: addressError } = await supabase
+      .from("user_addresses")
+      .select("*")
+      .eq("id", deliveryAddressId)
+      .eq("user_id", user.id)
+      .single()
+
+    if (addressError || !address) {
+      console.error("[Order Creation] FAILED: Invalid delivery address")
+      return { success: false, error: "Invalid delivery address" }
+    }
+
+    deliveryAddress = address
+
+    // Validate delivery pincode
+    if (!isValidPincode(deliveryAddress.pincode)) {
+      console.error("[Order Creation] FAILED: Delivery not available in", deliveryAddress.city, deliveryAddress.pincode)
+      return { 
+        success: false, 
+        error: `Delivery is not available in ${deliveryAddress.city} (${deliveryAddress.pincode}). Our service is currently available only in Khargone MP and Indore MP areas.` 
+      }
+    }
+
+    console.log("[Order Creation] Valid address found:", deliveryAddress.city, deliveryAddress.pincode)
+  } else {
+    // Check if user has any valid addresses
+    const { data: addresses, error: addressError } = await supabase
+      .from("user_addresses")
+      .select("id, pincode, city")
+      .eq("user_id", user.id)
+      .limit(10)
+
+    console.log("[Order Creation] Address check:", addresses?.length || 0)
+    
+    if (addressError || !addresses || addresses.length === 0) {
+      console.error("[Order Creation] FAILED: User has no address")
+      return { success: false, error: "Please add a delivery address before placing an order" }
+    }
+
+    // Check if any address is in service area
+    const validAddress = addresses.find(addr => isValidPincode(addr.pincode))
+    if (!validAddress) {
+      console.error("[Order Creation] FAILED: No valid delivery addresses")
+      return { 
+        success: false, 
+        error: "None of your addresses are in our service area. Our delivery is currently available only in Khargone MP and Indore MP areas. Please add a valid delivery address." 
+      }
+    }
+
+    deliveryAddress = validAddress
+    console.log("[Order Creation] Valid address found:", deliveryAddress.city, deliveryAddress.pincode)
   }
 
   const productId = formData.get("product_id") as string
@@ -65,16 +116,42 @@ export async function createOrder(formData: FormData) {
     return { success: false, error: "You cannot rent your own products" }
   }
 
-  // Check availability using our custom function
-  const { checkProductAvailability } = await import("./availability")
-  const availability = await checkProductAvailability(productId, rentalStartDate, rentalEndDate, user.id)
+  // Check if product is already booked for these dates
+  const { data: existingOrders, error: ordersError } = await supabase
+    .from("orders")
+    .select("id, rental_start_date, rental_end_date, status")
+    .eq("product_id", productId)
+    .in("status", ["pending", "confirmed", "picked_up", "dispatched", "delivered"])
+    .neq("user_id", user.id) // Exclude current user's orders
 
-  console.log("[Order Creation] Availability check:", availability)
+  console.log("[Order Creation] Existing orders check:", existingOrders?.length || 0)
 
-  if (!availability.isAvailable) {
-    console.error("[Order Creation] FAILED: Product not available", availability.reason)
-    return { success: false, error: availability.reason || "Product is not available for selected dates" }
+  if (ordersError) {
+    console.error("[Order Creation] FAILED: Error checking existing orders", ordersError)
+    return { success: false, error: "Error checking product availability" }
   }
+
+  // Check for date conflicts
+  const startDate = new Date(rentalStartDate)
+  const endDate = new Date(rentalEndDate)
+
+  if (existingOrders && existingOrders.length > 0) {
+    for (const order of existingOrders) {
+      const orderStart = new Date(order.rental_start_date)
+      const orderEnd = new Date(order.rental_end_date)
+
+      // Check if dates overlap
+      if ((startDate <= orderEnd && endDate >= orderStart)) {
+        console.error("[Order Creation] FAILED: Date conflict with order", order.id)
+        return { 
+          success: false, 
+          error: `This product is already booked from ${orderStart.toLocaleDateString()} to ${orderEnd.toLocaleDateString()}. Please select different dates.` 
+        }
+      }
+    }
+  }
+
+  console.log("[Order Creation] No date conflicts found")
 
   // Calculate rental days
   const start = new Date(rentalStartDate)
@@ -99,6 +176,7 @@ export async function createOrder(formData: FormData) {
     discount,
     total_amount: totalAmount,
     selected_size: selectedSize,
+    delivery_address_id: deliveryAddress?.id || null,
     status: "pending",
     payment_status: "pending",
     payment_method: paymentMethod,

@@ -48,7 +48,8 @@ export async function GET(request: NextRequest) {
           email,
           phone,
           city,
-          state
+          state,
+          pincode
         ),
         owner:profiles!orders_owner_id_fkey (
           id,
@@ -56,7 +57,20 @@ export async function GET(request: NextRequest) {
           email,
           phone,
           city,
-          state
+          state,
+          pincode
+        ),
+        delivery_address:user_addresses!orders_delivery_address_id_fkey (
+          id,
+          full_name,
+          phone,
+          address_line_1,
+          address_line_2,
+          city,
+          state,
+          pincode,
+          landmark,
+          instructions
         ),
         products!orders_product_id_fkey (
           id,

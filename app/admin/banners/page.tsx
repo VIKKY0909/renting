@@ -17,14 +17,12 @@ interface Banner {
   title: string
   subtitle?: string
   description?: string
-  button_text?: string
-  button_link?: string
+  link_text?: string
+  link_url?: string
   image_url: string
-  gradient_from: string
-  gradient_to: string
-  gradient_via: string
+  mobile_image_url?: string
   is_active: boolean
-  sort_order: number
+  display_order: number
   category_id?: string
   banner_categories?: {
     id: string
@@ -102,14 +100,12 @@ export default function AdminBannersPage() {
       title: '',
       subtitle: '',
       description: '',
-      button_text: '',
-      button_link: '',
+      link_text: '',
+      link_url: '',
       image_url: '',
-      gradient_from: '#ff6b9d',
-      gradient_to: '#c44569',
-      gradient_via: '#f8b500',
+      mobile_image_url: '',
       is_active: true,
-      sort_order: banners.length,
+      display_order: banners.length,
       category_id: '',
       created_at: '',
       updated_at: ''
@@ -265,7 +261,7 @@ export default function AdminBannersPage() {
               </div>
               <div className="absolute bottom-2 left-2">
                 <Badge variant="outline" className="bg-white/80 text-black">
-                  #{banner.sort_order}
+                  #{banner.display_order}
                 </Badge>
               </div>
             </div>
@@ -360,22 +356,24 @@ export default function AdminBannersPage() {
               {/* Button Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="button_text">Button Text</Label>
+                  <Label htmlFor="link_text">Button Text</Label>
                   <Input
-                    id="button_text"
-                    value={editingBanner.button_text}
-                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, button_text: e.target.value } : null)}
+                    id="link_text"
+                    value={editingBanner.link_text}
+                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, link_text: e.target.value } : null)}
                     placeholder="e.g., Shop Now"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Leave empty to use "Shop Now"</p>
                 </div>
                 <div>
-                  <Label htmlFor="button_link">Button Link</Label>
+                  <Label htmlFor="link_url">Button Link *</Label>
                   <Input
-                    id="button_link"
-                    value={editingBanner.button_link}
-                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, button_link: e.target.value } : null)}
+                    id="link_url"
+                    value={editingBanner.link_url}
+                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, link_url: e.target.value } : null)}
                     placeholder="/browse"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Required for button to show</p>
                 </div>
               </div>
 
@@ -408,70 +406,15 @@ export default function AdminBannersPage() {
                 </div>
               </div>
 
-              {/* Gradient Colors */}
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="gradient_from">Gradient From</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="gradient_from"
-                      value={editingBanner.gradient_from}
-                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradient_from: e.target.value } : null)}
-                      placeholder="#ff6b9d"
-                    />
-                    <input
-                      type="color"
-                      value={editingBanner.gradient_from}
-                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradient_from: e.target.value } : null)}
-                      className="w-12 h-10 border rounded"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="gradient_via">Gradient Via</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="gradient_via"
-                      value={editingBanner.gradient_via}
-                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradient_via: e.target.value } : null)}
-                      placeholder="#f8b500"
-                    />
-                    <input
-                      type="color"
-                      value={editingBanner.gradient_via}
-                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradient_via: e.target.value } : null)}
-                      className="w-12 h-10 border rounded"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="gradient_to">Gradient To</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="gradient_to"
-                      value={editingBanner.gradient_to}
-                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradient_to: e.target.value } : null)}
-                      placeholder="#c44569"
-                    />
-                    <input
-                      type="color"
-                      value={editingBanner.gradient_to}
-                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, gradient_to: e.target.value } : null)}
-                      className="w-12 h-10 border rounded"
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Settings */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sort_order">Sort Order</Label>
+                  <Label htmlFor="display_order">Display Order</Label>
                   <Input
-                    id="sort_order"
+                    id="display_order"
                     type="number"
-                    value={editingBanner.sort_order}
-                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, sort_order: parseInt(e.target.value) || 0 } : null)}
+                    value={editingBanner.display_order}
+                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, display_order: parseInt(e.target.value) || 0 } : null)}
                   />
                 </div>
                 <div>
@@ -497,19 +440,22 @@ export default function AdminBannersPage() {
                 <div>
                   <Label>Preview</Label>
                   <div 
-                    className="h-32 bg-cover bg-center rounded-md relative"
+                    className="h-48 bg-cover bg-center rounded-md relative overflow-hidden"
                     style={{ backgroundImage: `url(${editingBanner.image_url})` }}
                   >
-                    <div 
-                      className="absolute inset-0 rounded-md"
-                      style={{
-                        background: `linear-gradient(135deg, ${editingBanner.gradient_from}20, ${editingBanner.gradient_via}20, ${editingBanner.gradient_to}20)`
-                      }}
-                    />
-                    <div className="absolute bottom-2 left-2 text-white">
-                      <div className="font-bold">{editingBanner.title}</div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+                    <div className="absolute bottom-4 left-4 text-white space-y-2">
+                      <div className="font-bold text-lg">{editingBanner.title}</div>
                       {editingBanner.subtitle && (
                         <div className="text-sm opacity-90">{editingBanner.subtitle}</div>
+                      )}
+                      {editingBanner.description && (
+                        <div className="text-xs opacity-80">{editingBanner.description}</div>
+                      )}
+                      {editingBanner.link_url && (
+                        <div className="inline-block px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-md text-sm font-semibold">
+                          {editingBanner.link_text || 'Shop Now'}
+                        </div>
                       )}
                     </div>
                   </div>

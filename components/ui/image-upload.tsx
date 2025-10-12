@@ -102,6 +102,8 @@ export function ImageUpload({
       
       {/* Upload Area */}
       <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
         className={cn(
           "border-2 border-dashed border-border rounded-lg p-6 text-center transition-colors",
           "hover:border-primary/50 cursor-pointer",
@@ -110,9 +112,18 @@ export function ImageUpload({
         )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        onClick={openFileDialog}
+        onClick={(e) => {
+          e.stopPropagation()
+          openFileDialog()
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            openFileDialog()
+          }
+        }}
       >
-        <div className="flex flex-col items-center space-y-2">
+        <div className="flex flex-col items-center space-y-2 pointer-events-none">
           {isUploading ? (
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           ) : (
@@ -122,19 +133,19 @@ export function ImageUpload({
             {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
           </div>
           <div className="text-xs text-muted-foreground">
-            PNG, JPG, WEBP up to 10MB each
+            PNG, JPG, WEBP up to 5MB each
           </div>
         </div>
       </div>
 
       {/* Hidden File Input */}
-      <Input
+      <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
         multiple
         onChange={(e) => handleFileSelect(e.target.files)}
-        className="hidden"
+        style={{ display: 'none' }}
         disabled={disabled}
       />
 
@@ -170,12 +181,16 @@ export function ImageUpload({
         <Button
           type="button"
           variant="outline"
-          onClick={openFileDialog}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            openFileDialog()
+          }}
           disabled={disabled || isUploading}
           className="w-full"
         >
           <ImageIcon className="h-4 w-4 mr-2" />
-          Add More Images
+          Add More Images ({images.length}/{maxImages})
         </Button>
       )}
     </div>

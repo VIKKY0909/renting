@@ -14,6 +14,9 @@ interface CartItem {
   rentalEndDate: string
   rentalDays: number
   selectedSize?: string
+  deliveryPincode?: string
+  deliveryCity?: string
+  deliveryAddressId?: string
 }
 
 interface CartContextType {

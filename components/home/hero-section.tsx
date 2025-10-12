@@ -42,7 +42,7 @@ export function HeroSection() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 pt-16 animate-fade-in-up" style={{ animationDelay: '1.3s' }}>
+          {/* <div className="grid grid-cols-3 gap-8 pt-16 animate-fade-in-up" style={{ animationDelay: '1.3s' }}>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold gradient-text">500+</div>
               <div className="text-sm text-muted-foreground">Designer Outfits</div>
@@ -55,7 +55,7 @@ export function HeroSection() {
               <div className="text-3xl md:text-4xl font-bold gradient-text">50+</div>
               <div className="text-sm text-muted-foreground">Cities</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

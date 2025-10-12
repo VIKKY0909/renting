@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/browse/product-card"
 import { FilterSidebar } from "@/components/browse/filter-sidebar"
 import { Button } from "@/components/ui/button"
 import { SlidersHorizontal } from "lucide-react"
-import { getProducts } from "@/lib/actions/products"
+// Using direct API call instead of server action
 import { SkeletonLoader } from "@/components/ui/skeleton-loader"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 export function BrowseContent() {
@@ -30,16 +30,44 @@ export function BrowseContent() {
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true)
-      const { products: data, count } = await getProducts({
-        category: selectedCategory !== "all" ? selectedCategory : undefined,
-        search: searchQuery || undefined,
-        minPrice: priceRange[0],
-        maxPrice: priceRange[1],
+      
+      // Build query parameters
+      const params = new URLSearchParams()
+      if (selectedCategory !== "all") params.set('category', selectedCategory)
+      if (searchQuery) params.set('search', searchQuery)
+      if (priceRange[0] > 0) params.set('minPrice', priceRange[0].toString())
+      if (priceRange[1] < 5000) params.set('maxPrice', priceRange[1].toString())
+      if (sortBy !== 'featured') params.set('sortBy', sortBy)
+      
+      console.log('🔍 Frontend: Fetching products with params:', {
+        selectedCategory,
+        searchQuery,
+        priceRange,
         sortBy,
+        url: `/api/products?${params.toString()}`
       })
-      setProducts(data)
-      setTotalCount(count)
-      setLoading(false)
+      
+      try {
+        const response = await fetch(`/api/products?${params.toString()}`)
+        const data = await response.json()
+        
+        console.log('📦 Frontend: API response:', data)
+        console.log('📊 Frontend: Products count:', data.products?.length || 0)
+        console.log('📈 Frontend: Total count:', data.count || 0)
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to fetch products')
+        }
+        
+        setProducts(data.products || [])
+        setTotalCount(data.count || 0)
+      } catch (error) {
+        console.error('❌ Frontend: Error fetching products:', error)
+        setProducts([])
+        setTotalCount(0)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchProducts()
   }, [selectedCategory, priceRange, sortBy, searchQuery])

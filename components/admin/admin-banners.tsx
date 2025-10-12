@@ -12,9 +12,14 @@ interface Banner {
   id: string
   title: string
   subtitle?: string
+  description?: string
   image_url: string
+  mobile_image_url?: string
+  link_text?: string
+  link_url?: string
   is_active: boolean
-  sort_order: number
+  display_order: number
+  category_id?: string
   banner_categories?: {
     name: string
   }

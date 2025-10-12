@@ -15,64 +15,72 @@ export async function getProducts(filters?: {
   try {
     const supabase = await createClient()
 
-  let query = supabase
-    .from("products")
-    .select(
-      `
-      id, title, description, short_description, brand, color, fabric, occasion,
-      rental_price, security_deposit, original_price, bust, waist, length, sleeve_length,
-      images, condition, status, is_available, total_rentals, average_rating,
-      available_from, available_until, created_at, updated_at,
-      owner:profiles!products_owner_id_fkey(id, full_name, avatar_url),
-      category:categories!products_category_id_fkey(id, name, slug)
-    `,
-      { count: "exact" },
-    )
-    .eq("status", "approved")
-    .eq("is_available", true)
+    let query = supabase
+      .from("products")
+      .select(
+        `
+        id, title, description, short_description, brand, color, fabric, occasion,
+        rental_price, security_deposit, original_price, bust, waist, length, sleeve_length,
+        images, condition, status, is_available, total_rentals, average_rating,
+        available_from, available_until, created_at, updated_at,
+        owner:profiles!products_owner_id_fkey(id, full_name, avatar_url),
+        category:categories(id, name, slug)
+      `,
+        { count: "exact" }
+      )
+      .eq("status", "approved")
+      .eq("is_available", true)
 
-  if (filters?.category) {
-    query = query.eq("category.slug", filters.category)
-  }
+    // ✅ Category filter (fixed relation alias)
+    if (filters?.category) {
+      query = query.eq("category.slug", filters.category)
+    }
 
-  if (filters?.search) {
-    query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
-  }
+    // ✅ Search filter
+    if (filters?.search) {
+      query = query.or(
+        `title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
+      )
+    }
 
-  if (filters?.minPrice) {
-    query = query.gte("rental_price", filters.minPrice)
-  }
+    // ✅ Price filters
+    if (filters?.minPrice) {
+      query = query.gte("rental_price", filters.minPrice)
+    }
 
-  if (filters?.maxPrice) {
-    query = query.lte("rental_price", filters.maxPrice)
-  }
+    if (filters?.maxPrice) {
+      query = query.lte("rental_price", filters.maxPrice)
+    }
 
-  // Sorting
-  switch (filters?.sortBy) {
-    case "price-low":
-      query = query.order("rental_price", { ascending: true })
-      break
-    case "price-high":
-      query = query.order("rental_price", { ascending: false })
-      break
-    case "popular":
-      query = query.order("total_rentals", { ascending: false })
-      break
-    case "rating":
-      query = query.order("average_rating", { ascending: false })
-      break
-    default:
-      query = query.order("created_at", { ascending: false })
-  }
+    // ✅ Sorting logic
+    switch (filters?.sortBy) {
+      case "price-low":
+        query = query.order("rental_price", { ascending: true })
+        break
+      case "price-high":
+        query = query.order("rental_price", { ascending: false })
+        break
+      case "popular":
+        query = query.order("total_rentals", { ascending: false })
+        break
+      case "rating":
+        query = query.order("average_rating", { ascending: false })
+        break
+      default:
+        query = query.order("created_at", { ascending: false })
+    }
 
-  if (filters?.limit) {
-    query = query.limit(filters.limit)
-  }
+    // ✅ Pagination
+    if (filters?.limit && filters?.offset !== undefined) {
+      query = query.range(
+        filters.offset,
+        filters.offset + (filters.limit || 10) - 1
+      )
+    } else if (filters?.limit) {
+      query = query.limit(filters.limit)
+    }
 
-  if (filters?.offset) {
-    query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
-  }
-
+    // ✅ Execute query
     const { data, error, count } = await query
 
     if (error) {
@@ -83,7 +91,11 @@ export async function getProducts(filters?: {
     return { products: data || [], count: count || 0, error: null }
   } catch (err) {
     console.error("[v0] Network error fetching products:", err)
-    return { products: [], count: 0, error: "Network error - please try again" }
+    return {
+      products: [],
+      count: 0,
+      error: "Network error - please try again",
+    }
   }
 }
 

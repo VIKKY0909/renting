@@ -103,13 +103,17 @@ export const Header = memo(function Header() {
             </Link>
 
             {user ? (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover:bg-muted">
+                  <button 
+                    className="inline-flex items-center justify-center rounded-md h-10 w-10 hover:bg-muted relative transition-colors"
+                    aria-label="User menu"
+                    type="button"
+                  >
                     <User className="h-5 w-5" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 z-[9999] bg-popover text-popover-foreground shadow-md border" sideOffset={8}>
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
@@ -118,22 +122,22 @@ export const Header = memo(function Header() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer">
+                    <Link href="/profile" className="cursor-pointer w-full">
                       My Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/profile/orders" className="cursor-pointer">
+                    <Link href="/profile/orders" className="cursor-pointer w-full">
                       My Orders
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/manage-listings" className="cursor-pointer">
+                    <Link href="/manage-listings" className="cursor-pointer w-full">
                       Manage Listings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/wishlist" className="cursor-pointer">
+                    <Link href="/wishlist" className="cursor-pointer w-full">
                       Wishlist
                     </Link>
                   </DropdownMenuItem>
@@ -141,7 +145,7 @@ export const Header = memo(function Header() {
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link href="/admin" className="cursor-pointer font-medium text-primary">
+                        <Link href="/admin" className="cursor-pointer font-medium text-primary w-full">
                           Admin Dashboard
                         </Link>
                       </DropdownMenuItem>
@@ -236,58 +240,12 @@ export const Header = memo(function Header() {
               </Link>
             </div>
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full bg-transparent">
-                    <User className="h-4 w-4 mr-2" />
-                    My Profile
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer">
-                      My Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile/orders" className="cursor-pointer">
-                      My Orders
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/manage-listings" className="cursor-pointer">
-                      Manage Listings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/wishlist" className="cursor-pointer">
-                      Wishlist
-                    </Link>
-                  </DropdownMenuItem>
-                  {profile?.is_admin && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin" className="cursor-pointer font-medium text-primary">
-                          Admin Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Link href="/profile">
+                <Button variant="outline" className="w-full bg-transparent justify-start" aria-label="Go to profile">
+                  <User className="h-4 w-4 mr-2" />
+                  My Profile
+                </Button>
+              </Link>
             ) : (
               <Link href="/login">
                 <Button variant="outline" className="w-full bg-transparent">

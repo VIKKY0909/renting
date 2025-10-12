@@ -67,14 +67,12 @@ export async function PUT(
       title,
       subtitle,
       description,
-      button_text,
-      button_link,
+      link_text,
+      link_url,
       image_url,
-      gradient_from,
-      gradient_to,
-      gradient_via,
+      mobile_image_url,
       category_id,
-      sort_order,
+      display_order,
       is_active
     } = body
 
@@ -89,16 +87,13 @@ export async function PUT(
         title,
         subtitle,
         description,
-        button_text,
-        button_link,
+        link_text,
+        link_url,
         image_url,
-        gradient_from,
-        gradient_to,
-        gradient_via,
+        mobile_image_url,
         category_id,
-        sort_order,
-        is_active,
-        updated_by: user.id
+        display_order,
+        is_active
       })
       .eq('id', params.id)
       .select(`

@@ -47,8 +47,8 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
 
     // Validate measurements
     const bust = parseFloat(formData.get("bust_size") as string)
-    if (isNaN(bust) || bust < 20 || bust > 200) {
-      errors.bust_size = "Bust size must be between 20 and 200 inches"
+    if (isNaN(bust) || bust < 32 || bust > 200) {
+      errors.bust_size = "Bust size must be between 32 and 200 inches"
     }
 
     const waist = parseFloat(formData.get("waist_size") as string)
@@ -282,10 +282,14 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
                       id="bust_size" 
                       name="bust_size" 
                       type="number" 
+                      min="32"
+                      max="200"
+                      step="0.5"
                       placeholder="e.g., 34" 
                       className={`bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`} 
                       required 
                     />
+                    <p className="text-xs text-muted-foreground">Minimum: 32 inches</p>
                     {validationErrors.bust_size && (
                       <p className="text-destructive text-sm">{validationErrors.bust_size}</p>
                     )}

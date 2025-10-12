@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
           description
         )
       `)
-      .order('sort_order', { ascending: true })
+      .order('display_order', { ascending: true })
       .order('created_at', { ascending: false })
 
     // If not admin, only get active banners
@@ -73,14 +73,14 @@ export async function POST(request: NextRequest) {
       title,
       subtitle,
       description,
-      button_text,
-      button_link,
+      link_text,
+      link_url,
       image_url,
       gradient_from,
       gradient_to,
       gradient_via,
       category_id,
-      sort_order,
+      display_order,
       is_active = true
     } = body
 
@@ -95,17 +95,14 @@ export async function POST(request: NextRequest) {
         title,
         subtitle,
         description,
-        button_text,
-        button_link,
+        link_text,
+        link_url,
         image_url,
-        gradient_from: gradient_from || '#ff6b9d',
-        gradient_to: gradient_to || '#c44569',
-        gradient_via: gradient_via || '#f8b500',
+        mobile_image_url: image_url,
         category_id,
-        sort_order: sort_order || 0,
+        display_order: display_order || 0,
         is_active,
-        created_by: user.id,
-        updated_by: user.id
+        created_by: user.id
       })
       .select(`
         *,

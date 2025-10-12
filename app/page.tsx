@@ -13,13 +13,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col page-transition">
       <Header />
+      {/* <DiscountBanner /> */}
       <main className="flex-1">
         <AutoSliderBanner />
         <div className="animate-fade-in-up">
           <HeroSection />
-        </div>
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          <DiscountBanner />
         </div>
         <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <WhyRentimade />

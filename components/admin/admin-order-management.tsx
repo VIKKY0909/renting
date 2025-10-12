@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Image from "next/image"
 
@@ -37,7 +40,18 @@ interface Order {
   admin_notes?: string
   customer_notes?: string
   pickup_address?: string
-  delivery_address?: string
+  delivery_address?: {
+    id: string
+    full_name: string
+    phone: string
+    address_line_1: string
+    address_line_2?: string
+    city: string
+    state: string
+    pincode: string
+    landmark?: string
+    instructions?: string
+  }
   pickup_scheduled_date?: string
   delivery_scheduled_date?: string
   return_scheduled_date?: string
@@ -57,6 +71,7 @@ interface Order {
     phone: string
     city: string
     state: string
+    pincode?: string
   }
   owner: {
     id: string
@@ -65,6 +80,7 @@ interface Order {
     phone: string
     city: string
     state: string
+    pincode?: string
   }
   products: {
     id: string
@@ -88,6 +104,9 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
   const [loading, setLoading] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [activeTab, setActiveTab] = useState("pending")
+  const [notesDialogOpen, setNotesDialogOpen] = useState(false)
+  const [notesText, setNotesText] = useState("")
+  const [savingNotes, setSavingNotes] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -150,6 +169,43 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
     } catch (error) {
       console.error('Error updating order:', error)
       toast.error('Error updating order')
+    }
+  }
+
+  const handleSaveNotes = async () => {
+    if (!selectedOrder || !notesText.trim()) {
+      toast.error('Please enter notes')
+      return
+    }
+
+    setSavingNotes(true)
+    try {
+      const response = await fetch(`/api/admin/orders/${selectedOrder.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          admin_notes: notesText
+        })
+      })
+
+      if (response.ok) {
+        toast.success('Notes saved successfully')
+        setNotesDialogOpen(false)
+        setNotesText("")
+        fetchOrders()
+        // Update selected order
+        if (selectedOrder) {
+          setSelectedOrder({...selectedOrder, admin_notes: notesText})
+        }
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Failed to save notes')
+      }
+    } catch (error) {
+      console.error('Error saving notes:', error)
+      toast.error('Error saving notes')
+    } finally {
+      setSavingNotes(false)
     }
   }
 
@@ -483,6 +539,10 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
                                   <Phone className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-xs">{order.customer?.phone}</span>
                                 </div>
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-xs">{order.customer?.city}, {order.customer?.state} - {order.customer?.pincode}</span>
+                                </div>
                               </div>
                             </div>
 
@@ -501,9 +561,34 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
                                   <Phone className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-xs">{order.owner?.phone}</span>
                                 </div>
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-xs">{order.owner?.city}, {order.owner?.state} - {order.owner?.pincode}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
+
+                          {/* Delivery Address */}
+                          {order.delivery_address && (
+                            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <MapPin className="h-4 w-4 text-green-700" />
+                                <span className="font-medium text-sm text-green-900">Delivery Address</span>
+                              </div>
+                              <div className="text-sm space-y-1 text-green-800">
+                                <p className="font-medium">{order.delivery_address.full_name}</p>
+                                <p>{order.delivery_address.address_line_1}</p>
+                                {order.delivery_address.address_line_2 && <p>{order.delivery_address.address_line_2}</p>}
+                                {order.delivery_address.landmark && <p>Landmark: {order.delivery_address.landmark}</p>}
+                                <p>{order.delivery_address.city}, {order.delivery_address.state} - {order.delivery_address.pincode}</p>
+                                <p>Phone: {order.delivery_address.phone}</p>
+                                {order.delivery_address.instructions && (
+                                  <p className="text-xs italic mt-1">Note: {order.delivery_address.instructions}</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
                           {/* Admin Notes */}
                           {order.admin_notes && (
@@ -740,31 +825,63 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
               </div>
 
               {/* Addresses */}
-              {(selectedOrder.pickup_address || selectedOrder.delivery_address) && (
-                <div>
-                  <h4 className="font-semibold mb-3">Addresses</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedOrder.pickup_address && (
-                      <div className="p-4 bg-muted rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Package className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium text-sm">Pickup Address</span>
-                        </div>
-                        <p className="text-sm">{selectedOrder.pickup_address}</p>
-                      </div>
-                    )}
-                    {selectedOrder.delivery_address && (
-                      <div className="p-4 bg-muted rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium text-sm">Delivery Address</span>
-                        </div>
-                        <p className="text-sm">{selectedOrder.delivery_address}</p>
-                      </div>
-                    )}
+              <div>
+                <h4 className="font-semibold mb-3">Full Addresses</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Customer Address */}
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin className="h-4 w-4 text-blue-700" />
+                      <span className="font-medium text-sm text-blue-900">Customer Address</span>
+                    </div>
+                    <div className="text-sm space-y-1 text-blue-800">
+                      <p className="font-semibold">{selectedOrder.customer?.full_name}</p>
+                      <p>{selectedOrder.customer?.city}, {selectedOrder.customer?.state}</p>
+                      {selectedOrder.customer?.pincode && <p>Pincode: {selectedOrder.customer.pincode}</p>}
+                      <p className="pt-2 border-t border-blue-200">Phone: {selectedOrder.customer?.phone}</p>
+                      <p>Email: {selectedOrder.customer?.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Owner Address */}
+                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin className="h-4 w-4 text-purple-700" />
+                      <span className="font-medium text-sm text-purple-900">Owner Address</span>
+                    </div>
+                    <div className="text-sm space-y-1 text-purple-800">
+                      <p className="font-semibold">{selectedOrder.owner?.full_name}</p>
+                      <p>{selectedOrder.owner?.city}, {selectedOrder.owner?.state}</p>
+                      {selectedOrder.owner?.pincode && <p>Pincode: {selectedOrder.owner.pincode}</p>}
+                      <p className="pt-2 border-t border-purple-200">Phone: {selectedOrder.owner?.phone}</p>
+                      <p>Email: {selectedOrder.owner?.email}</p>
+                    </div>
                   </div>
                 </div>
-              )}
+
+                {/* Delivery Address (if different) */}
+                {selectedOrder.delivery_address && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Package className="h-4 w-4 text-green-700" />
+                      <span className="font-medium text-sm text-green-900">Delivery Address (Customer Selected)</span>
+                    </div>
+                    <div className="text-sm space-y-1 text-green-800">
+                      <p className="font-semibold">{selectedOrder.delivery_address.full_name}</p>
+                      <p>{selectedOrder.delivery_address.address_line_1}</p>
+                      {selectedOrder.delivery_address.address_line_2 && <p>{selectedOrder.delivery_address.address_line_2}</p>}
+                      {selectedOrder.delivery_address.landmark && <p className="text-xs italic">Landmark: {selectedOrder.delivery_address.landmark}</p>}
+                      <p>{selectedOrder.delivery_address.city}, {selectedOrder.delivery_address.state} - {selectedOrder.delivery_address.pincode}</p>
+                      <p className="pt-2 border-t border-green-200">Phone: {selectedOrder.delivery_address.phone}</p>
+                      {selectedOrder.delivery_address.instructions && (
+                        <p className="text-xs bg-green-100 p-2 rounded mt-2">
+                          <span className="font-medium">Instructions:</span> {selectedOrder.delivery_address.instructions}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Admin Actions */}
               <div>
@@ -796,14 +913,11 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
                   <Button
                     variant="outline"
                     onClick={() => {
-                      const notes = prompt('Add admin notes:')
-                      if (notes) {
-                        // Handle adding notes
-                        console.log('Adding notes:', notes)
-                      }
+                      setNotesText(selectedOrder.admin_notes || "")
+                      setNotesDialogOpen(true)
                     }}
                   >
-                    Add Notes
+                    {selectedOrder.admin_notes ? 'Edit Notes' : 'Add Notes'}
                   </Button>
                 </div>
               </div>
@@ -811,6 +925,51 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
           </Card>
         </div>
       )}
+
+      {/* Notes Dialog */}
+      <Dialog open={notesDialogOpen} onOpenChange={setNotesDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedOrder?.admin_notes ? 'Edit Order Notes' : 'Add Order Notes'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="notes">Admin Notes</Label>
+              <Textarea
+                id="notes"
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                placeholder="Add notes about this order (visible only to admins)..."
+                className="min-h-32"
+                rows={6}
+              />
+              <p className="text-xs text-muted-foreground">
+                These notes are only visible to admins and will be saved to the order.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setNotesDialogOpen(false)
+                setNotesText("")
+              }}
+              disabled={savingNotes}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNotes}
+              disabled={savingNotes || !notesText.trim()}
+            >
+              {savingNotes ? 'Saving...' : 'Save Notes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

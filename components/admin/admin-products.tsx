@@ -26,7 +26,8 @@ export function AdminProducts() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const { products: data, error } = await getAllProducts({ status: "pending" })
+        // Fetch ALL products, not just pending ones
+        const { products: data, error } = await getAllProducts()
         if (error) {
           console.error("Error fetching products:", error)
         } else {

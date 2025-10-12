@@ -11,13 +11,14 @@ interface BannerSlide {
   subtitle?: string
   description?: string
   image_url: string
-  button_text?: string
-  button_link?: string
-  gradient_from: string
-  gradient_to: string
-  gradient_via: string
+  mobile_image_url?: string
+  link_text?: string
+  link_url?: string
+  category_id?: string
+  display_order: number
   is_active: boolean
-  sort_order: number
+  created_at: string
+  updated_at: string
 }
 
 export function AutoSliderBanner() {
@@ -43,13 +44,12 @@ export function AutoSliderBanner() {
               subtitle: 'Designer Dresses',
               description: 'Discover our latest collection of stunning designer dresses for every occasion',
               image_url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1200&h=600&fit=crop',
-              button_text: 'Shop Now',
-              button_link: '/browse',
-              gradient_from: '#ff6b9d',
-              gradient_to: '#c44569',
-              gradient_via: '#f8b500',
+              link_text: 'Shop Now',
+              link_url: '/browse',
               is_active: true,
-              sort_order: 1
+              display_order: 1,
+              created_at: '',
+              updated_at: ''
             },
             {
               id: '2',
@@ -57,13 +57,12 @@ export function AutoSliderBanner() {
               subtitle: 'Up to 50% Off',
               description: 'Get ready for summer with our exclusive collection at unbeatable prices',
               image_url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=600&fit=crop',
-              button_text: 'View Sale',
-              button_link: '/browse?sale=true',
-              gradient_from: '#c44569',
-              gradient_to: '#f8b500',
-              gradient_via: '#ff6b9d',
+              link_text: 'View Sale',
+              link_url: '/browse?sale=true',
               is_active: true,
-              sort_order: 2
+              display_order: 2,
+              created_at: '',
+              updated_at: ''
             },
             {
               id: '3',
@@ -71,13 +70,12 @@ export function AutoSliderBanner() {
               subtitle: 'Dream Wedding',
               description: 'Make your special day unforgettable with our exquisite bridal collection',
               image_url: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=1200&h=600&fit=crop',
-              button_text: 'Explore',
-              button_link: '/browse?category=bridal',
-              gradient_from: '#f8b500',
-              gradient_to: '#ff6b9d',
-              gradient_via: '#c44569',
+              link_text: 'Explore',
+              link_url: '/browse?category=bridal',
               is_active: true,
-              sort_order: 3
+              display_order: 3,
+              created_at: '',
+              updated_at: ''
             }
           ])
         }
@@ -91,13 +89,12 @@ export function AutoSliderBanner() {
             subtitle: 'Designer Dresses',
             description: 'Discover our latest collection of stunning designer dresses for every occasion',
             image_url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1200&h=600&fit=crop',
-            button_text: 'Shop Now',
-            button_link: '/browse',
-            gradient_from: '#ff6b9d',
-            gradient_to: '#c44569',
-            gradient_via: '#f8b500',
+            link_text: 'Shop Now',
+            link_url: '/browse',
             is_active: true,
-            sort_order: 1
+            display_order: 1,
+            created_at: '',
+            updated_at: ''
           },
           {
             id: '2',
@@ -105,13 +102,12 @@ export function AutoSliderBanner() {
             subtitle: 'Up to 50% Off',
             description: 'Get ready for summer with our exclusive collection at unbeatable prices',
             image_url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=600&fit=crop',
-            button_text: 'View Sale',
-            button_link: '/browse?sale=true',
-            gradient_from: '#c44569',
-            gradient_to: '#f8b500',
-            gradient_via: '#ff6b9d',
+            link_text: 'View Sale',
+            link_url: '/browse?sale=true',
             is_active: true,
-            sort_order: 2
+            display_order: 2,
+            created_at: '',
+            updated_at: ''
           },
           {
             id: '3',
@@ -119,13 +115,12 @@ export function AutoSliderBanner() {
             subtitle: 'Dream Wedding',
             description: 'Make your special day unforgettable with our exquisite bridal collection',
             image_url: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=1200&h=600&fit=crop',
-            button_text: 'Explore',
-            button_link: '/browse?category=bridal',
-            gradient_from: '#f8b500',
-            gradient_to: '#ff6b9d',
-            gradient_via: '#c44569',
+            link_text: 'Explore',
+            link_url: '/browse?category=bridal',
             is_active: true,
-            sort_order: 3
+            display_order: 3,
+            created_at: '',
+            updated_at: ''
           }
         ])
       } finally {
@@ -199,12 +194,9 @@ export function AutoSliderBanner() {
               }}
             />
             
-            {/* Dynamic Gradient Overlay */}
+            {/* Dark Gradient Overlay */}
             <div 
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(135deg, ${slide.gradient_from}20, ${slide.gradient_via}20, ${slide.gradient_to}20)`
-              }}
+              className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"
             />
             
             {/* Content */}
@@ -225,13 +217,13 @@ export function AutoSliderBanner() {
                         {slide.description}
                       </p>
                     )}
-                    {slide.button_text && slide.button_link && (
-                      <Link href={slide.button_link}>
+                    {slide.link_url && (
+                      <Link href={slide.link_url}>
                         <Button 
                           size="lg" 
-                          className="btn-luxury text-lg px-8 py-6 animate-scale-in-spring"
+                          className="btn-luxury text-lg px-10 py-7 animate-scale-in-spring hover-glow shadow-2xl font-semibold"
                         >
-                          {slide.button_text}
+                          {slide.link_text || 'Shop Now'}
                         </Button>
                       </Link>
                     )}
@@ -273,19 +265,10 @@ export function AutoSliderBanner() {
                 : 'bg-white/50 hover:bg-white/70'
             }`}
             onClick={() => goToSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
-
-      {/* Auto-play Toggle */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
-        onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-      >
-        {isAutoPlaying ? '⏸️' : '▶️'}
-      </Button>
     </section>
   )
 }
