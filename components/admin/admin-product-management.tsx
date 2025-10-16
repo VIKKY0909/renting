@@ -172,67 +172,67 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="font-serif text-2xl font-bold mb-2">Product Management</h2>
-          <p className="text-muted-foreground">Review and manage product listings</p>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold mb-2">Product Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Review and manage product listings</p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-yellow-600" />
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">{stats.pending}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Pending</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.pending}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Eye className="h-4 w-4 text-blue-600" />
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Under Review</p>
-                <p className="text-2xl font-bold">{stats.under_review}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Under Review</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.under_review}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Approved</p>
-                <p className="text-2xl font-bold">{stats.approved}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Approved</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.approved}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-600" />
+              <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Rejected</p>
-                <p className="text-2xl font-bold">{stats.rejected}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Rejected</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.rejected}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
+        <Card className="col-span-2 sm:col-span-1">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-purple-600" />
+              <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Total</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
           </CardContent>
@@ -242,26 +242,48 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
       {/* Products List */}
       <Card>
         <CardHeader>
-          <CardTitle>Products</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Products</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="pending">Pending ({stats.pending})</TabsTrigger>
-              <TabsTrigger value="under_review">Under Review ({stats.under_review})</TabsTrigger>
-              <TabsTrigger value="approved">Approved ({stats.approved})</TabsTrigger>
-              <TabsTrigger value="rejected">Rejected ({stats.rejected})</TabsTrigger>
-              <TabsTrigger value="all">All ({stats.total})</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto">
+              <TabsList className="grid w-full grid-cols-5 min-w-[500px]">
+                <TabsTrigger value="pending" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Pending</span>
+                  <span className="sm:hidden">Pend</span>
+                  <span className="ml-1">({stats.pending})</span>
+                </TabsTrigger>
+                <TabsTrigger value="under_review" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Under Review</span>
+                  <span className="sm:hidden">Review</span>
+                  <span className="ml-1">({stats.under_review})</span>
+                </TabsTrigger>
+                <TabsTrigger value="approved" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Approved</span>
+                  <span className="sm:hidden">Appr</span>
+                  <span className="ml-1">({stats.approved})</span>
+                </TabsTrigger>
+                <TabsTrigger value="rejected" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">Rejected</span>
+                  <span className="sm:hidden">Rej</span>
+                  <span className="ml-1">({stats.rejected})</span>
+                </TabsTrigger>
+                <TabsTrigger value="all" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">All</span>
+                  <span className="sm:hidden">All</span>
+                  <span className="ml-1">({stats.total})</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value={activeTab} className="mt-6">
-              <div className="space-y-4">
+            <TabsContent value={activeTab} className="mt-4 sm:mt-6">
+              <div className="space-y-3 sm:space-y-4">
                 {products.map((product) => (
                   <Card key={product.id} className="hover-lift">
-                    <CardContent className="p-6">
-                      <div className="flex gap-6">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                         {/* Product Image */}
-                        <div className="w-24 h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                        <div className="w-full sm:w-24 h-32 sm:h-24 rounded-lg overflow-hidden bg-muted flex-shrink-0 mx-auto sm:mx-0">
                           {product.images && product.images.length > 0 ? (
                             <Image
                               src={product.images[0]}
@@ -279,16 +301,16 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
 
                         {/* Product Details */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-semibold text-lg truncate">{product.title}</h3>
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                            <h3 className="font-semibold text-base sm:text-lg truncate">{product.title}</h3>
                             {getStatusBadge(product.status)}
                           </div>
                           
-                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-muted-foreground mb-3 line-clamp-2">
                             {product.description}
                           </p>
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                             <div>
                               <p className="text-muted-foreground">Category</p>
                               <p className="font-medium">{product.categories?.name}</p>
@@ -310,19 +332,19 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                           </div>
 
                           {/* Owner Details */}
-                          <div className="mt-4 p-3 bg-muted rounded-lg">
+                          <div className="mt-3 sm:mt-4 p-3 bg-muted rounded-lg">
                             <div className="flex items-center gap-2 mb-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium text-sm">Owner Details</span>
+                              <User className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                              <span className="font-medium text-xs sm:text-sm">Owner Details</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
                               <div>
                                 <p className="text-muted-foreground">Name</p>
-                                <p className="font-medium">{product.profiles?.full_name}</p>
+                                <p className="font-medium break-words">{product.profiles?.full_name}</p>
                               </div>
                               <div>
                                 <p className="text-muted-foreground">Email</p>
-                                <p className="font-medium">{product.profiles?.email}</p>
+                                <p className="font-medium break-all">{product.profiles?.email}</p>
                               </div>
                               <div>
                                 <p className="text-muted-foreground">Phone</p>
@@ -330,7 +352,7 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                               </div>
                               <div className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-sm">
+                                <span className="text-xs sm:text-sm">
                                   {product.profiles?.city}, {product.profiles?.state}
                                 </span>
                               </div>
@@ -354,25 +376,28 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                           )}
 
                           {/* Action Buttons */}
-                          <div className="flex gap-2 mt-4">
+                          <div className="flex flex-wrap gap-2 mt-3 sm:mt-4">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => setSelectedProduct(product)}
+                              className="text-xs sm:text-sm"
                             >
-                              <Eye className="h-4 w-4 mr-1" />
-                              View Details
+                              <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                              <span className="hidden sm:inline">View Details</span>
+                              <span className="sm:hidden">View</span>
                             </Button>
                             
                             {product.status === 'pending' && (
                               <>
                                 <Button
                                   size="sm"
-                                  className="bg-green-600 hover:bg-green-700"
+                                  className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
                                   onClick={() => handleProductAction(product.id, 'approved')}
                                 >
-                                  <CheckCircle className="h-4 w-4 mr-1" />
-                                  Approve
+                                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                  <span className="hidden sm:inline">Approve</span>
+                                  <span className="sm:hidden">✓</span>
                                 </Button>
                                 <Button
                                   size="sm"
@@ -383,9 +408,11 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                                       handleProductAction(product.id, 'rejected', reason)
                                     }
                                   }}
+                                  className="text-xs sm:text-sm"
                                 >
-                                  <XCircle className="h-4 w-4 mr-1" />
-                                  Reject
+                                  <XCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                  <span className="hidden sm:inline">Reject</span>
+                                  <span className="sm:hidden">✗</span>
                                 </Button>
                               </>
                             )}
@@ -395,20 +422,23 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => handleProductAction(product.id, 'suspended')}
+                                className="text-xs sm:text-sm"
                               >
-                                <AlertTriangle className="h-4 w-4 mr-1" />
-                                Suspend
+                                <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                <span className="hidden sm:inline">Suspend</span>
+                                <span className="sm:hidden">Suspend</span>
                               </Button>
                             )}
 
                             {product.status === 'suspended' && (
                               <Button
                                 size="sm"
-                                className="bg-green-600 hover:bg-green-700"
+                                className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
                                 onClick={() => handleProductAction(product.id, 'approved')}
                               >
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Reactivate
+                                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                <span className="hidden sm:inline">Reactivate</span>
+                                <span className="sm:hidden">Reactivate</span>
                               </Button>
                             )}
                           </div>

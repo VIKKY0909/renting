@@ -229,78 +229,78 @@ export function AdminUserManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="font-serif text-2xl font-bold mb-2">User Management</h2>
-          <p className="text-muted-foreground">Manage users, roles, and permissions</p>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold mb-2">User Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage users, roles, and permissions</p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-blue-600" />
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Total Users</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Total Users</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <UserCheck className="h-4 w-4 text-green-600" />
+              <UserCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Regular Users</p>
-                <p className="text-2xl font-bold">{stats.users}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Regular Users</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.users}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-blue-600" />
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Admins</p>
-                <p className="text-2xl font-bold">{stats.admins}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Admins</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.admins}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-purple-600" />
+              <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Super Admins</p>
-                <p className="text-2xl font-bold">{stats.super_admins}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Super Admins</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.super_admins}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold">{stats.active}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Active</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.active}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <UserX className="h-4 w-4 text-red-600" />
+              <UserX className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Inactive</p>
-                <p className="text-2xl font-bold">{stats.inactive}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Inactive</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.inactive}</p>
               </div>
             </div>
           </CardContent>
@@ -310,19 +310,20 @@ export function AdminUserManagement() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">User Management</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex-1">
               <Input
                 placeholder="Search users by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                className="text-sm"
               />
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-full md:w-40">
+              <SelectTrigger className="w-full sm:w-40 text-sm">
                 <SelectValue placeholder="Filter by role" />
               </SelectTrigger>
               <SelectContent>
@@ -333,7 +334,7 @@ export function AdminUserManagement() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-40">
+              <SelectTrigger className="w-full sm:w-40 text-sm">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -345,13 +346,13 @@ export function AdminUserManagement() {
           </div>
 
           {/* Users List */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {filteredUsers.map((user) => (
               <Card key={user.id} className="hover-lift">
-                <CardContent className="p-6">
-                  <div className="flex gap-6">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {/* User Avatar */}
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden bg-muted flex-shrink-0 mx-auto sm:mx-0">
                       {user.avatar_url ? (
                         <img
                           src={user.avatar_url}
@@ -360,56 +361,56 @@ export function AdminUserManagement() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Users className="h-8 w-8 text-muted-foreground" />
+                          <Users className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                         </div>
                       )}
                     </div>
 
                     {/* User Details */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-lg">{user.full_name}</h3>
-                        <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                        <h3 className="font-semibold text-base sm:text-lg text-center sm:text-left">{user.full_name}</h3>
+                        <div className="flex gap-2 justify-center sm:justify-start">
                           {getRoleBadge(user.role)}
                           {getActivityBadge(user.activity_status)}
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm mb-3 sm:mb-4">
                         <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <span className="truncate">{user.email}</span>
+                          <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                          <span className="truncate break-all">{user.email}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
+                          <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                           <span>{user.phone || 'N/A'}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                           <span>{user.city}, {user.state}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                           <span>Joined {new Date(user.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
 
                       {/* Activity Stats */}
-                      <div className="grid grid-cols-3 gap-4 mb-4">
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <Package className="h-4 w-4 text-blue-600 mx-auto mb-1" />
-                          <p className="text-sm text-muted-foreground">Products</p>
-                          <p className="font-semibold">{user.total_products}</p>
+                      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-4">
+                        <div className="text-center p-2 sm:p-3 bg-muted rounded-lg">
+                          <Package className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 mx-auto mb-1" />
+                          <p className="text-xs sm:text-sm text-muted-foreground">Products</p>
+                          <p className="text-sm sm:text-base font-semibold">{user.total_products}</p>
                         </div>
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <ShoppingCart className="h-4 w-4 text-green-600 mx-auto mb-1" />
-                          <p className="text-sm text-muted-foreground">Orders</p>
-                          <p className="font-semibold">{user.total_orders}</p>
+                        <div className="text-center p-2 sm:p-3 bg-muted rounded-lg">
+                          <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mx-auto mb-1" />
+                          <p className="text-xs sm:text-sm text-muted-foreground">Orders</p>
+                          <p className="text-sm sm:text-base font-semibold">{user.total_orders}</p>
                         </div>
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <Activity className="h-4 w-4 text-purple-600 mx-auto mb-1" />
-                          <p className="text-sm text-muted-foreground">Logins</p>
-                          <p className="font-semibold">{user.login_count}</p>
+                        <div className="text-center p-2 sm:p-3 bg-muted rounded-lg">
+                          <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600 mx-auto mb-1" />
+                          <p className="text-xs sm:text-sm text-muted-foreground">Logins</p>
+                          <p className="text-sm sm:text-base font-semibold">{user.login_count}</p>
                         </div>
                       </div>
 
@@ -432,30 +433,35 @@ export function AdminUserManagement() {
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => openEditDialog(user)}
+                          className="text-xs sm:text-sm"
                         >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit User
+                          <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                          <span className="hidden sm:inline">Edit User</span>
+                          <span className="sm:hidden">Edit</span>
                         </Button>
                         
                         <Button
                           size="sm"
                           variant={user.is_active ? "destructive" : "default"}
                           onClick={() => handleToggleUserStatus(user.id, user.is_active)}
+                          className="text-xs sm:text-sm"
                         >
                           {user.is_active ? (
                             <>
-                              <UserX className="h-4 w-4 mr-1" />
-                              Deactivate
+                              <UserX className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                              <span className="hidden sm:inline">Deactivate</span>
+                              <span className="sm:hidden">Deactivate</span>
                             </>
                           ) : (
                             <>
-                              <UserCheck className="h-4 w-4 mr-1" />
-                              Activate
+                              <UserCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                              <span className="hidden sm:inline">Activate</span>
+                              <span className="sm:hidden">Activate</span>
                             </>
                           )}
                         </Button>

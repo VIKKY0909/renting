@@ -24,31 +24,55 @@ export default function ContactContent() {
     e.preventDefault()
     setIsLoading(true)
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setSubmitted(true)
-    setIsLoading(false)
-    setTimeout(() => setSubmitted(false), 3000)
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        setSubmitted(true)
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        })
+        setTimeout(() => setSubmitted(false), 5000)
+      } else {
+        throw new Error(result.error || 'Failed to send message')
+      }
+    } catch (error) {
+      console.error('Contact form error:', error)
+      alert('Failed to send message. Please try again or contact us directly.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const contactInfo = [
     {
       icon: Phone,
       title: "Phone",
-      details: "+91 7724023688",
-      link: "tel:+917724023688",
+      details: "+91 9329862253",
+      link: "tel:+919329862253",
     },
     {
       icon: Mail,
       title: "Email",
-      details: "rentimade@gmail.com",
-      link: "mailto:rentimade@gmail.com",
+      details: "contactrentimade@gmail.com",
+      link: "mailto:contactrentimade@gmail.com",
     },
     {
       icon: MapPin,
       title: "Address",
-      details: "Mumbai, Maharashtra, India",
+      details: "Khargon, Madhya Pradesh, India",
       link: null,
     },
     {
@@ -129,8 +153,8 @@ export default function ContactContent() {
                   <p className="text-muted-foreground mb-3">
                     Too late to place your order for the event? Call us and we'll do our best to rescue you.
                   </p>
-                  <a href="tel:+917724023688" className="text-primary font-medium hover:underline">
-                    +91 7724023688
+                  <a href="tel:+919329862253" className="text-primary font-medium hover:underline">
+                    +91 9329862253
                   </a>
                 </div>
 
@@ -139,8 +163,8 @@ export default function ContactContent() {
                   <p className="text-muted-foreground mb-3">
                     Your design deserves more than hanging in a cupboard. Partner with us!
                   </p>
-                  <a href="mailto:rentimade@gmail.com" className="text-primary font-medium hover:underline">
-                    rentimade@gmail.com
+                  <a href="mailto:contactrentimade@gmail.com" className="text-primary font-medium hover:underline">
+                    contactrentimade@gmail.com
                   </a>
                 </div>
               </div>

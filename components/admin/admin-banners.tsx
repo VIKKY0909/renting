@@ -104,26 +104,27 @@ export function AdminBanners() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2 className="font-serif text-2xl font-bold mb-2">Banner Management</h2>
-          <p className="text-muted-foreground">Manage homepage banners and promotional content</p>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold mb-2">Banner Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage homepage banners and promotional content</p>
         </div>
         <Link href="/admin/banners">
-          <Button className="btn-luxury">
+          <Button className="btn-luxury w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
-            Manage Banners
+            <span className="hidden sm:inline">Manage Banners</span>
+            <span className="sm:hidden">Manage</span>
           </Button>
         </Link>
       </div>
 
       {banners.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <ImageIcon className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No banners found</h3>
-            <p className="text-muted-foreground text-center mb-4">
+          <CardContent className="flex flex-col items-center justify-center py-8 sm:py-12">
+            <ImageIcon className="h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold mb-2">No banners found</h3>
+            <p className="text-sm sm:text-base text-muted-foreground text-center mb-4 px-4">
               Create your first banner to showcase your collections and promotions.
             </p>
             <Link href="/admin/banners">
@@ -135,46 +136,47 @@ export function AdminBanners() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {banners.slice(0, 6).map((banner) => (
             <Card key={banner.id} className="overflow-hidden hover-lift">
-              <div className="relative h-32 bg-cover bg-center" style={{ backgroundImage: `url(${banner.image_url})` }}>
+              <div className="relative h-24 sm:h-32 bg-cover bg-center" style={{ backgroundImage: `url(${banner.image_url})` }}>
                 <div className="absolute top-2 right-2">
-                  <Badge variant={banner.is_active ? "default" : "secondary"}>
+                  <Badge variant={banner.is_active ? "default" : "secondary"} className="text-xs">
                     {banner.is_active ? <Eye className="h-3 w-3 mr-1" /> : <EyeOff className="h-3 w-3 mr-1" />}
-                    {banner.is_active ? 'Active' : 'Inactive'}
+                    <span className="hidden sm:inline">{banner.is_active ? 'Active' : 'Inactive'}</span>
                   </Badge>
                 </div>
                 <div className="absolute bottom-2 left-2">
-                  <Badge variant="outline" className="bg-white/80 text-black">
+                  <Badge variant="outline" className="bg-white/80 text-black text-xs">
                     #{banner.sort_order}
                   </Badge>
                 </div>
               </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg line-clamp-1">{banner.title}</CardTitle>
+              <CardHeader className="pb-2 p-3 sm:p-6">
+                <CardTitle className="text-sm sm:text-lg line-clamp-1">{banner.title}</CardTitle>
                 {banner.subtitle && (
-                  <p className="text-sm text-muted-foreground line-clamp-1">{banner.subtitle}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">{banner.subtitle}</p>
                 )}
                 {banner.banner_categories && (
-                  <Badge variant="secondary" className="w-fit">{banner.banner_categories.name}</Badge>
+                  <Badge variant="secondary" className="w-fit text-xs">{banner.banner_categories.name}</Badge>
                 )}
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 p-3 sm:p-6">
                 <div className="flex gap-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => handleToggleActive(banner)}
-                    className="flex-1"
+                    className="flex-1 text-xs sm:text-sm"
                   >
                     {banner.is_active ? <EyeOff className="h-3 w-3 mr-1" /> : <Eye className="h-3 w-3 mr-1" />}
-                    {banner.is_active ? 'Hide' : 'Show'}
+                    <span className="hidden sm:inline">{banner.is_active ? 'Hide' : 'Show'}</span>
                   </Button>
                   <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => handleDeleteBanner(banner.id)}
+                    className="px-2 sm:px-3"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -188,7 +190,7 @@ export function AdminBanners() {
       {banners.length > 6 && (
         <div className="text-center">
           <Link href="/admin/banners">
-            <Button variant="outline">
+            <Button variant="outline" className="w-full sm:w-auto">
               View All Banners ({banners.length})
             </Button>
           </Link>

@@ -294,118 +294,119 @@ export function AdminOrderManagement({ initialOrders = [] }: OrderManagementProp
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2 className="font-serif text-2xl font-bold mb-2">Order Management</h2>
-          <p className="text-muted-foreground">Track and manage rental orders</p>
+          <h2 className="font-serif text-xl sm:text-2xl font-bold mb-2">Order Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Track and manage rental orders</p>
         </div>
         <Button 
           variant="outline" 
           onClick={fetchOrders}
           disabled={loading}
+          className="w-full sm:w-auto text-xs sm:text-sm"
         >
           {loading ? 'Refreshing...' : 'Refresh Orders'}
         </Button>
       </div>
 
       {/* Stats Cards - Complete Order Flow */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-2 sm:gap-3 lg:gap-4">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-yellow-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">{stats.pending}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Pending</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.pending}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-blue-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Confirmed</p>
-                <p className="text-2xl font-bold">{stats.confirmed}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Confirmed</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.confirmed}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-orange-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Package className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Picked Up</p>
-                <p className="text-2xl font-bold">{stats.picked_up}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Picked Up</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.picked_up}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-purple-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Truck className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Dispatched</p>
-                <p className="text-2xl font-bold">{stats.dispatched}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Dispatched</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.dispatched}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Delivered</p>
-                <p className="text-2xl font-bold">{stats.delivered}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Delivered</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.delivered}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <RotateCcw className="h-4 w-4 text-orange-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Return Pickup</p>
-                <p className="text-2xl font-bold">{stats.picked_up_for_return}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Return Pickup</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.picked_up_for_return}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <RotateCcw className="h-4 w-4 text-blue-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Returned</p>
-                <p className="text-2xl font-bold">{stats.returned}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Returned</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.returned}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold">{stats.completed}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Completed</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.completed}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-purple-600" />
+          <CardContent className="p-2 sm:p-3 lg:p-4">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600" />
               <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">Total</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
           </CardContent>

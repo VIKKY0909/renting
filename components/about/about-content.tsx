@@ -30,19 +30,18 @@ export default function AboutContent() {
 
   const team = [
     {
-      name: "Priya Sharma",
-      role: "Founder & CEO",
-      image: "/professional-indian-woman-ceo.jpg",
+      name: "Ishika Neema",
+      role: "Co-Founder & CEO",
+      image: "/aa.png",
+      bio:
+        "I believe that fashion should be fun, sustainable and in a budget. At Rentimade, I am in charge of vision, creative decisions and collaboration. I transform concepts into actions that connect individuals and give them self assurance in their attire. My goal is to monetize every Indian's wardrobe.",
     },
     {
-      name: "Rahul Verma",
-      role: "Head of Operations",
-      image: "/professional-indian-man-operations.jpg",
-    },
-    {
-      name: "Ananya Patel",
-      role: "Fashion Curator",
-      image: "/professional-indian-woman-fashion.jpg",
+      name: "Atharv Atre",
+      role: "Co-Founder & MD",
+      image: "/at.png",
+      bio:
+        "As a founding member and MD, my job is to execute the strategy and plans while prioritising a seamless experience for both lenders as well as renters. I make sure every person who is linked to Rentimade — from users to partner stores and employees — feels a core part of Rentimade.",
     },
   ]
 
@@ -62,7 +61,7 @@ export default function AboutContent() {
               About Rentimade
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto text-balance leading-relaxed">
-              Redefining fashion accessibility in India, one outfit at a time
+              Wear more. Waste less. Share fashion, share stories.
             </p>
           </motion.div>
         </div>
@@ -81,17 +80,20 @@ export default function AboutContent() {
               <h2 className="font-serif text-4xl md:text-5xl mb-6 text-balance">Our Story</h2>
               <div className="space-y-4 text-lg leading-relaxed text-muted-foreground">
                 <p>
-                  Rentimade was born from a simple observation: beautiful designer outfits sitting unused in wardrobes
-                  while others searched for the perfect outfit for their special occasions.
+                  At Rentimade we believe that fashion should be smart, stylish and sustainable. We are building a
+                  world where every outfit tells a story — not one that’s forgotten after a single wear, but one that’s
+                  rescued and connected through sharing.
                 </p>
                 <p>
-                  We created a platform that connects fashion lovers across India, making designer wear accessible and
-                  sustainable. Whether you're attending a wedding, a festive celebration, or a special event, Rentimade
-                  brings premium fashion within reach.
+                  At Rentimade, you can rent out stylish outfits without any fuss. You only slay — we handle
+                  everything from packaging and dry cleaning to doorstep pickup and delivery. Everything is taken care of.
                 </p>
                 <p>
-                  Today, we're proud to serve thousands of customers and lenders, building a community that believes in
-                  sharing, sustainability, and celebrating every special moment in style.
+                  Our vision is to become India’s most trusted platform for sharing, and to make fashion effectively
+                  accessible to everyone without chaos. We aim to build a world where fashion is shared, not wasted.
+                </p>
+                <p className="font-medium text-foreground">
+                  Wear more. Waste less. Share fashion, share stories.
                 </p>
               </div>
             </motion.div>
@@ -161,7 +163,7 @@ export default function AboutContent() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {team.map((member, index) => (
               <motion.div
                 key={member.name}
@@ -171,16 +173,19 @@ export default function AboutContent() {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="group"
               >
-                <div className="relative h-80 rounded-xl overflow-hidden mb-4">
+                <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden mb-4">
                   <Image
                     src={member.image || "/placeholder.svg"}
                     alt={member.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover object-top md:object-center group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <h3 className="font-serif text-2xl mb-1">{member.name}</h3>
                 <p className="text-muted-foreground">{member.role}</p>
+                {member.bio && (
+                  <p className="text-muted-foreground leading-relaxed mt-2">{member.bio}</p>
+                )}
               </motion.div>
             ))}
           </div>

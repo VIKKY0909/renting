@@ -24,6 +24,8 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
   const [images, setImages] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [bustSelect, setBustSelect] = useState("")
+  const [waistSelect, setWaistSelect] = useState("")
   const router = useRouter()
 
   const validateForm = (formData: FormData): Record<string, string> => {
@@ -278,18 +280,34 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="bust_size">Bust Size (inches) *</Label>
-                    <Input 
-                      id="bust_size" 
-                      name="bust_size" 
-                      type="number" 
-                      min="32"
-                      max="200"
-                      step="0.5"
-                      placeholder="e.g., 34" 
-                      className={`bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`} 
-                      required 
-                    />
-                    <p className="text-xs text-muted-foreground">Minimum: 32 inches</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        id="bust_size_select"
+                        className={`w-full p-3 rounded-lg border border-border bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`}
+                        value={bustSelect}
+                        onChange={(e) => setBustSelect(e.target.value)}
+                        required
+                      >
+                        <option value="" disabled>Select</option>
+                        {Array.from({ length: (44 - 28) + 1 }, (_, i) => 28 + i).map((n) => (
+                          <option key={n} value={String(n)}>{n}</option>
+                        ))}
+                        <option value="custom">Custom</option>
+                      </select>
+                      <Input 
+                        id="bust_size_input"
+                        name="bust_size" 
+                        type="number" 
+                        placeholder={bustSelect === 'custom' ? 'Enter bust' : ''}
+                        className={`bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`} 
+                        disabled={bustSelect !== 'custom'}
+                        required 
+                      />
+                    </div>
+                    {bustSelect !== 'custom' && bustSelect !== '' && (
+                      <input type="hidden" name="bust_size" value={bustSelect} />
+                    )}
+                    <p className="text-xs text-muted-foreground">Select 28-44 or choose Custom</p>
                     {validationErrors.bust_size && (
                       <p className="text-destructive text-sm">{validationErrors.bust_size}</p>
                     )}
@@ -297,14 +315,34 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
 
                   <div className="space-y-2">
                     <Label htmlFor="waist_size">Waist Size (inches) *</Label>
-                    <Input 
-                      id="waist_size" 
-                      name="waist_size" 
-                      type="number" 
-                      placeholder="e.g., 28" 
-                      className={`bg-transparent ${validationErrors.waist_size ? 'border-destructive' : ''}`} 
-                      required 
-                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        id="waist_size_select"
+                        className={`w-full p-3 rounded-lg border border-border bg-transparent ${validationErrors.waist_size ? 'border-destructive' : ''}`}
+                        value={waistSelect}
+                        onChange={(e) => setWaistSelect(e.target.value)}
+                        required
+                      >
+                        <option value="" disabled>Select</option>
+                        {Array.from({ length: (44 - 26) + 1 }, (_, i) => 26 + i).map((n) => (
+                          <option key={n} value={String(n)}>{n}</option>
+                        ))}
+                        <option value="custom">Custom</option>
+                      </select>
+                      <Input 
+                        id="waist_size_input"
+                        name="waist_size" 
+                        type="number" 
+                        placeholder={waistSelect === 'custom' ? 'Enter waist' : ''}
+                        className={`bg-transparent ${validationErrors.waist_size ? 'border-destructive' : ''}`} 
+                        disabled={waistSelect !== 'custom'}
+                        required 
+                      />
+                    </div>
+                    {waistSelect !== 'custom' && waistSelect !== '' && (
+                      <input type="hidden" name="waist_size" value={waistSelect} />
+                    )}
+                    <p className="text-xs text-muted-foreground">Select 26-44 or choose Custom</p>
                     {validationErrors.waist_size && (
                       <p className="text-destructive text-sm">{validationErrors.waist_size}</p>
                     )}

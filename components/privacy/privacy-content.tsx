@@ -193,15 +193,21 @@ export default function PrivacyContent() {
               <div className="space-y-2 text-muted-foreground">
                 <p>
                   <strong>Email:</strong>{" "}
-                  <a href="mailto:rentimade@gmail.com" className="text-primary hover:underline">
-                    rentimade@gmail.com
+                  <a href="mailto:contactrentimade@gmail.com" className="text-primary hover:underline">
+                    contactrentimade@gmail.com
                   </a>
                 </p>
                 <p>
                   <strong>Phone:</strong>{" "}
-                  <a href="tel:+917724023688" className="text-primary hover:underline">
-                    +91 7724023688
+                  <a href="tel:+919329862253" className="text-primary hover:underline">
+                    +91 9329862253
                   </a>
+                </p>
+                <p>
+                  <strong>Address:</strong>{" "}
+                  <span className="text-muted-foreground">
+                    Khargon, Madhya Pradesh, India
+                  </span>
                 </p>
               </div>
             </div>

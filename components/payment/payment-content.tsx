@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { motion } from "framer-motion"
-import { CreditCard, Wallet, Building2, Shield, ArrowLeft, Check, MapPin, Plus } from "lucide-react"
+import { Shield, ArrowLeft, Check, MapPin, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -20,7 +20,7 @@ import Link from "next/link"
 export default function PaymentContent() {
   const router = useRouter()
   const { items, getTotalPrice, getTotalDeposit, getGrandTotal, clearCart } = useCart()
-  const [paymentMethod, setPaymentMethod] = useState("card")
+  const [paymentMethod, setPaymentMethod] = useState("cod")
   const [processing, setProcessing] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -149,8 +149,8 @@ export default function PaymentContent() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Cart
           </Button>
-          <h1 className="font-serif text-4xl md:text-5xl text-balance mb-2">Complete Your Payment</h1>
-          <p className="text-muted-foreground">Secure checkout powered by industry-leading payment providers</p>
+          <h1 className="font-serif text-4xl md:text-5xl text-balance mb-2">Confirm Your Order</h1>
+          <p className="text-muted-foreground">Cash on Delivery (COD) only</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -245,99 +245,15 @@ export default function PaymentContent() {
               <form onSubmit={handlePayment} className="space-y-6">
                 <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                   <div className="space-y-4">
-                    {/* Card Payment */}
-                    <div className="flex items-center space-x-3 p-4 rounded-xl border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
-                      <RadioGroupItem value="card" id="card" />
-                      <Label htmlFor="card" className="flex items-center gap-3 cursor-pointer flex-1">
-                        <CreditCard className="w-5 h-5 text-primary" />
-                        <span className="font-medium">Credit / Debit Card</span>
-                      </Label>
-                    </div>
-
-                    {/* UPI */}
-                    <div className="flex items-center space-x-3 p-4 rounded-xl border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
-                      <RadioGroupItem value="upi" id="upi" />
-                      <Label htmlFor="upi" className="flex items-center gap-3 cursor-pointer flex-1">
-                        <Wallet className="w-5 h-5 text-primary" />
-                        <span className="font-medium">UPI</span>
-                      </Label>
-                    </div>
-
-                    {/* Net Banking */}
-                    <div className="flex items-center space-x-3 p-4 rounded-xl border-2 border-border hover:border-primary/50 transition-colors cursor-pointer">
-                      <RadioGroupItem value="netbanking" id="netbanking" />
-                      <Label htmlFor="netbanking" className="flex items-center gap-3 cursor-pointer flex-1">
-                        <Building2 className="w-5 h-5 text-primary" />
-                        <span className="font-medium">Net Banking</span>
-                      </Label>
+                    <div className="flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full border-2 border-primary bg-primary" />
+                        <span className="font-medium">Cash on Delivery (COD)</span>
+                      </div>
+                      <Badge variant="secondary">Recommended</Badge>
                     </div>
                   </div>
                 </RadioGroup>
-
-                {/* Card Details Form */}
-                {paymentMethod === "card" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-4 pt-4"
-                  >
-                    <div>
-                      <Label>Card Number</Label>
-                      <Input type="text" placeholder="1234 5678 9012 3456" maxLength={19} required />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>Expiry Date</Label>
-                        <Input type="text" placeholder="MM/YY" maxLength={5} required />
-                      </div>
-                      <div>
-                        <Label>CVV</Label>
-                        <Input type="text" placeholder="123" maxLength={3} required />
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Cardholder Name</Label>
-                      <Input type="text" placeholder="Name on card" required />
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* UPI Form */}
-                {paymentMethod === "upi" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-4 pt-4"
-                  >
-                    <div>
-                      <Label>UPI ID</Label>
-                      <Input type="text" placeholder="yourname@upi" required />
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Net Banking Form */}
-                {paymentMethod === "netbanking" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-4 pt-4"
-                  >
-                    <div>
-                      <Label>Select Bank</Label>
-                      <select className="w-full p-3 rounded-lg border border-border bg-background">
-                        <option>State Bank of India</option>
-                        <option>HDFC Bank</option>
-                        <option>ICICI Bank</option>
-                        <option>Axis Bank</option>
-                        <option>Kotak Mahindra Bank</option>
-                      </select>
-                    </div>
-                  </motion.div>
-                )}
 
                 {/* Error Message */}
                 {error && (
@@ -346,12 +262,12 @@ export default function PaymentContent() {
                   </div>
                 )}
 
-                {/* Security Notice */}
+                {/* COD Notice */}
                 <div className="flex items-start gap-3 p-4 bg-secondary/50 rounded-xl">
                   <Shield className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground mb-1">Secure Payment</p>
-                    <p>Your payment information is encrypted and secure. We never store your complete card details.</p>
+                    <p className="font-medium text-foreground mb-1">Cash on Delivery</p>
+                    <p>Pay in cash at the time of delivery. No online payment is required.</p>
                   </div>
                 </div>
 
@@ -371,7 +287,7 @@ export default function PaymentContent() {
                   ) : !selectedAddressId ? (
                     "Select Address to Continue"
                   ) : (
-                    `Pay ₹${orderSummary.total.toLocaleString("en-IN")}`
+                    "Place Order (COD)"
                   )}
                 </Button>
               </form>

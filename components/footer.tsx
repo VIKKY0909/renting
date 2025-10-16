@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Instagram, Facebook, Mail, Phone } from "lucide-react"
+import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react"
 import { memo } from "react"
 
 export const Footer = memo(function Footer() {
@@ -10,13 +10,17 @@ export const Footer = memo(function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Colour%20Logo%20With%20Black%20BG-tkgKC6mQgEtBgSkwsc6O0LPOZiRJsS.png"
-              alt="Rentimade"
-              width={140}
-              height={48}
-              className="h-12 w-auto"
-            />
+          <Link href="/" className="flex items-center gap-2 transition-all duration-300 hover:opacity-90 animate-logo-glow">
+            <span className="rounded-full bg-background/80 shadow-lg p-1 border border-border overflow-hidden flex items-center justify-center">
+              <Image
+                src={require("@/public/logo.png")}
+                alt="Rentimade"
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-full object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </span>
+          </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Your dream outfit on rent. Explore designer wear at affordable prices. Sustainable fashion made easy.
             </p>
@@ -103,15 +107,19 @@ export const Footer = memo(function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <a href="tel:7724023688" className="hover:text-primary transition-colors">
-                  7724023688
+                <a href="tel:+919329862253" className="hover:text-primary transition-colors">
+                  +91 9329862253
                 </a>
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <a href="mailto:rentimade@gmail.com" className="hover:text-primary transition-colors">
-                  rentimade@gmail.com
+                <a href="mailto:contactrentimade@gmail.com" className="hover:text-primary transition-colors">
+                  contactrentimade@gmail.com
                 </a>
+              </li>
+              <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4" />
+                <span>Khargon, Madhya Pradesh</span>
               </li>
             </ul>
           </div>

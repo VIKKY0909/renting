@@ -12,15 +12,15 @@ export function FashionEmergency() {
                 <Clock className="h-4 w-4" />
                 <span>Last Minute Orders</span>
               </div>
-              <h2 className="font-serif text-3xl md:text-4xl font-bold">Fashion Emergency?</h2>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold">Closet Crisis?</h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Too late to place your order for the event? Don't worry! Call us and we'll do our best to rescue you.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-accent" />
-                  <a href="tel:7724023688" className="text-lg font-semibold hover:text-accent transition-colors">
-                    7724023688
+                  <a href="tel:+919329862253" className="text-lg font-semibold hover:text-accent transition-colors">
+                    +91 9329862253
                   </a>
                 </div>
               </div>
@@ -29,7 +29,7 @@ export function FashionEmergency() {
               </Button>
             </div>
             <div>
-              <img src="/urgent-fashion-emergency-designer-dress.jpg" alt="Fashion Emergency" className="w-full h-auto rounded-2xl" />
+              <img src="/urgent-fashion-emergency-designer-dress.jpg" alt="Closet Crisis" className="w-full h-auto rounded-2xl" />
             </div>
           </div>
         </div>

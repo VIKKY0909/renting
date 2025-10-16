@@ -85,7 +85,7 @@ export async function createOrder(formData: FormData) {
   const rentalStartDate = formData.get("rental_start_date") as string
   const rentalEndDate = formData.get("rental_end_date") as string
   const selectedSize = formData.get("selected_size") as string
-  const paymentMethod = formData.get("payment_method") as string || "card"
+  const paymentMethod = (formData.get("payment_method") as string) || "cod"
 
   console.log("[Order Creation] Order params:", { productId, rentalStartDate, rentalEndDate, selectedSize, paymentMethod })
 
@@ -245,7 +245,7 @@ export async function createMultiItemOrder(formData: FormData) {
 
   // Parse items from JSON
   const itemsJson = formData.get("items") as string
-  const paymentMethod = formData.get("payment_method") as string || "card"
+  const paymentMethod = (formData.get("payment_method") as string) || "cod"
   
   console.log("[Multi-Item Order] Payment method:", paymentMethod)
   console.log("[Multi-Item Order] Items JSON:", itemsJson)
