@@ -159,8 +159,19 @@ export async function createProduct(formData: FormData) {
   const color = formData.get("color") as string
   const brand = formData.get("brand") as string
   const occasion = formData.get("occasion") as string
-  const bust = parseFloat(formData.get("bust_size") as string)
-  const waist = parseFloat(formData.get("waist_size") as string)
+  const parseRangeToNumber = (value: string | null): number | null => {
+    if (!value) return null
+    const trimmed = value.trim()
+    const rangeMatch = trimmed.match(/^\s*(\d{1,3})(?:\s*-\s*(\d{1,3}))?\s*$/)
+    if (!rangeMatch) return Number.parseFloat(trimmed)
+    const first = Number.parseFloat(rangeMatch[1])
+    const second = rangeMatch[2] ? Number.parseFloat(rangeMatch[2]) : null
+    if (Number.isNaN(first)) return null
+    if (second !== null && Number.isNaN(second)) return null
+    return second !== null ? Math.max(first, second) : first
+  }
+  const bust = parseRangeToNumber(formData.get("bust_size") as string)
+  const waist = parseRangeToNumber(formData.get("waist_size") as string)
   const length = parseFloat(formData.get("length_size") as string)
   const sleeve_length = formData.get("sleeve_length") as string
   const available_from = formData.get("available_from") as string
@@ -194,8 +205,8 @@ export async function createProduct(formData: FormData) {
     rental_price,
     security_deposit,
     original_price,
-    bust,
-    waist,
+    bust: bust as number,
+    waist: waist as number,
     length,
     sleeve_length,
     available_from,
@@ -255,8 +266,36 @@ export async function updateProduct(id: string, formData: FormData) {
     rental_price: Number.parseFloat(formData.get("rental_price") as string),
     security_deposit: Number.parseFloat(formData.get("security_deposit") as string),
     original_price: formData.get("original_price") ? Number.parseFloat(formData.get("original_price") as string) : null,
-    bust: formData.get("bust_size") ? Number.parseFloat(formData.get("bust_size") as string) : null,
-    waist: formData.get("waist_size") ? Number.parseFloat(formData.get("waist_size") as string) : null,
+    bust: (() => {
+      const v = formData.get("bust_size") as string | null
+      const trimmed = (v || "").trim()
+      if (!trimmed) return null
+      const m = trimmed.match(/^\s*(\d{1,3})(?:\s*-\s*(\d{1,3}))?\s*$/)
+      if (!m) {
+        const n = Number.parseFloat(trimmed)
+        return Number.isNaN(n) ? null : n
+      }
+      const a = Number.parseFloat(m[1])
+      const b = m[2] ? Number.parseFloat(m[2]) : null
+      if (Number.isNaN(a)) return null
+      if (b !== null && Number.isNaN(b)) return null
+      return b !== null ? Math.max(a, b) : a
+    })(),
+    waist: (() => {
+      const v = formData.get("waist_size") as string | null
+      const trimmed = (v || "").trim()
+      if (!trimmed) return null
+      const m = trimmed.match(/^\s*(\d{1,3})(?:\s*-\s*(\d{1,3}))?\s*$/)
+      if (!m) {
+        const n = Number.parseFloat(trimmed)
+        return Number.isNaN(n) ? null : n
+      }
+      const a = Number.parseFloat(m[1])
+      const b = m[2] ? Number.parseFloat(m[2]) : null
+      if (Number.isNaN(a)) return null
+      if (b !== null && Number.isNaN(b)) return null
+      return b !== null ? Math.max(a, b) : a
+    })(),
     length: formData.get("length_size") ? Number.parseFloat(formData.get("length_size") as string) : null,
     sleeve_length: formData.get("sleeve_length") as string,
     available_from: formData.get("available_from") as string,

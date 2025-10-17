@@ -20,7 +20,7 @@ export function DesignerLabel() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-primary" />
                   <a href="tel:+917724023688" className="text-lg hover:text-primary transition-colors">
-                    +91 9329862253
+                    +91 7724023688
                   </a>
                 </div>
                 <div className="flex items-center gap-3">

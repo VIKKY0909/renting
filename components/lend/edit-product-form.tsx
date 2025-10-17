@@ -167,26 +167,28 @@ export function EditProductForm({ productId }: EditProductFormProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="bust_size">Bust Size (inches) *</Label>
+                <Label htmlFor="bust_size">Bust Size or Range (inches) *</Label>
                 <Input 
                   id="bust_size" 
                   name="bust_size" 
-                  type="number" 
+                  type="text" 
+                  inputMode="numeric"
                   defaultValue={product.bust}
-                  placeholder="e.g., 34" 
+                  placeholder="e.g., 34 or 28-44" 
                   className="bg-transparent" 
                   required 
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="waist_size">Waist Size (inches) *</Label>
+                <Label htmlFor="waist_size">Waist Size or Range (inches) *</Label>
                 <Input 
                   id="waist_size" 
                   name="waist_size" 
-                  type="number" 
+                  type="text" 
+                  inputMode="numeric"
                   defaultValue={product.waist}
-                  placeholder="e.g., 28" 
+                  placeholder="e.g., 28 or 26-44" 
                   className="bg-transparent" 
                   required 
                 />

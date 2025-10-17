@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react"
+import { Instagram, Mail, Phone, MapPin } from "lucide-react"
 import { memo } from "react"
 
 export const Footer = memo(function Footer() {
@@ -26,7 +26,7 @@ export const Footer = memo(function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/rentimade_com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
@@ -34,12 +34,23 @@ export const Footer = memo(function Footer() {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="https://facebook.com"
+                href="https://wa.me/917724023688"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
+                aria-label="WhatsApp"
               >
-                <Facebook className="h-5 w-5" />
+                {/* WhatsApp brand icon (inline SVG) */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path d="M20.52 3.48A11.94 11.94 0 0 0 12.04 0C5.44.03.1 5.37.1 11.98c0 2.11.55 4.15 1.6 5.96L0 24l6.24-1.64c1.74.95 3.71 1.45 5.73 1.45h.01c6.61 0 11.97-5.36 12.02-11.96A11.94 11.94 0 0 0 20.52 3.48Zm-8.27 18.11h-.01c-1.83 0-3.61-.49-5.17-1.42l-.37-.22-3.7.97.99-3.6-.24-.37A9.96 9.96 0 0 1 2.05 12C2.02 6.98 6.08 2.93 11.08 2.9c2.65-.02 5.15 1 7.03 2.86a9.9 9.9 0 0 1 2.94 7.06c-.04 5-4.12 9.17-9.8 9.17Z"/>
+                  <path d="M17.19 13.7c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15s-.77.97-.95 1.17-.35.22-.65.08a8.06 8.06 0 0 1-2.37-1.46 8.86 8.86 0 0 1-1.64-2.03c-.17-.3 0-.46.13-.62.13-.15.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.57-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37s-1.05 1.02-1.05 2.47 1.08 2.86 1.23 3.05c.15.2 2.13 3.25 5.17 4.56.72.31 1.3.5 1.74.64.73.24 1.4.2 1.93.12.59-.09 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z"/>
+                </svg>
               </a>
             </div>
           </div>
@@ -108,7 +119,7 @@ export const Footer = memo(function Footer() {
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
                 <a href="tel:+917724023688" className="hover:text-primary transition-colors">
-                  +91 9329862253
+                  +91 7724023688
                 </a>
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -119,7 +130,7 @@ export const Footer = memo(function Footer() {
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4" />
-                <span>Khargon, Madhya Pradesh</span>
+                <span>Indore, Madhya Pradesh</span>
               </li>
             </ul>
           </div>

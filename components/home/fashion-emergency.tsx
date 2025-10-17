@@ -20,7 +20,7 @@ export function FashionEmergency() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-accent" />
                   <a href="tel:+917724023688" className="text-lg font-semibold hover:text-accent transition-colors">
-                    +91 9329862253
+                    +91 7724023688
                   </a>
                 </div>
               </div>

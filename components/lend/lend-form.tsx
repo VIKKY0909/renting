@@ -24,9 +24,25 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
   const [images, setImages] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
-  const [bustSelect, setBustSelect] = useState("")
-  const [waistSelect, setWaistSelect] = useState("")
+  // free-text range inputs like "28-44" supported
   const router = useRouter()
+
+  const parseRangeToNumber = (value: string): number | null => {
+    if (!value) return null
+    const trimmed = value.trim()
+    // allow formats: "32", "28-44", "28 - 44"
+    const rangeMatch = trimmed.match(/^\s*(\d{1,3})(?:\s*-\s*(\d{1,3}))?\s*$/)
+    if (!rangeMatch) return null
+    const first = Number.parseFloat(rangeMatch[1])
+    const second = rangeMatch[2] ? Number.parseFloat(rangeMatch[2]) : null
+    if (Number.isNaN(first)) return null
+    if (second !== null && Number.isNaN(second)) return null
+    if (second !== null) {
+      // Use the max of the range to represent the measurement
+      return Math.max(first, second)
+    }
+    return first
+  }
 
   const validateForm = (formData: FormData): Record<string, string> => {
     const errors: Record<string, string> = {}
@@ -48,14 +64,16 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
     }
 
     // Validate measurements
-    const bust = parseFloat(formData.get("bust_size") as string)
-    if (isNaN(bust) || bust < 32 || bust > 200) {
-      errors.bust_size = "Bust size must be between 32 and 200 inches"
+    const bustRaw = (formData.get("bust_size") as string) || ""
+    const bust = parseRangeToNumber(bustRaw)
+    if (bust === null || bust < 32 || bust > 200) {
+      errors.bust_size = "Enter bust like 28-44 or a single number (32-200)"
     }
 
-    const waist = parseFloat(formData.get("waist_size") as string)
-    if (isNaN(waist) || waist < 15 || waist > 150) {
-      errors.waist_size = "Waist size must be between 15 and 150 inches"
+    const waistRaw = (formData.get("waist_size") as string) || ""
+    const waist = parseRangeToNumber(waistRaw)
+    if (waist === null || waist < 15 || waist > 150) {
+      errors.waist_size = "Enter waist like 28-44 or a single number (15-150)"
     }
 
     const length = parseFloat(formData.get("length_size") as string)
@@ -279,70 +297,34 @@ export function LendForm({ onSubmit, onCancel }: LendFormProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="bust_size">Bust Size (inches) *</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <select
-                        id="bust_size_select"
-                        className={`w-full p-3 rounded-lg border border-border bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`}
-                        value={bustSelect}
-                        onChange={(e) => setBustSelect(e.target.value)}
-                        required
-                      >
-                        <option value="" disabled>Select</option>
-                        {Array.from({ length: (44 - 28) + 1 }, (_, i) => 28 + i).map((n) => (
-                          <option key={n} value={String(n)}>{n}</option>
-                        ))}
-                        <option value="custom">Custom</option>
-                      </select>
-                      <Input 
-                        id="bust_size_input"
-                        name="bust_size" 
-                        type="number" 
-                        placeholder={bustSelect === 'custom' ? 'Enter bust' : ''}
-                        className={`bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`} 
-                        disabled={bustSelect !== 'custom'}
-                        required 
-                      />
-                    </div>
-                    {bustSelect !== 'custom' && bustSelect !== '' && (
-                      <input type="hidden" name="bust_size" value={bustSelect} />
-                    )}
-                    <p className="text-xs text-muted-foreground">Select 28-44 or choose Custom</p>
+                    <Label htmlFor="bust_size">Bust Size or Range (inches) *</Label>
+                    <Input 
+                      id="bust_size"
+                      name="bust_size" 
+                      type="text" 
+                      inputMode="numeric"
+                      placeholder="e.g., 34 or 28-44" 
+                      className={`bg-transparent ${validationErrors.bust_size ? 'border-destructive' : ''}`} 
+                      required 
+                    />
+                    <p className="text-xs text-muted-foreground">Enter a single number or range like 28-44</p>
                     {validationErrors.bust_size && (
                       <p className="text-destructive text-sm">{validationErrors.bust_size}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="waist_size">Waist Size (inches) *</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <select
-                        id="waist_size_select"
-                        className={`w-full p-3 rounded-lg border border-border bg-transparent ${validationErrors.waist_size ? 'border-destructive' : ''}`}
-                        value={waistSelect}
-                        onChange={(e) => setWaistSelect(e.target.value)}
-                        required
-                      >
-                        <option value="" disabled>Select</option>
-                        {Array.from({ length: (44 - 26) + 1 }, (_, i) => 26 + i).map((n) => (
-                          <option key={n} value={String(n)}>{n}</option>
-                        ))}
-                        <option value="custom">Custom</option>
-                      </select>
-                      <Input 
-                        id="waist_size_input"
-                        name="waist_size" 
-                        type="number" 
-                        placeholder={waistSelect === 'custom' ? 'Enter waist' : ''}
-                        className={`bg-transparent ${validationErrors.waist_size ? 'border-destructive' : ''}`} 
-                        disabled={waistSelect !== 'custom'}
-                        required 
-                      />
-                    </div>
-                    {waistSelect !== 'custom' && waistSelect !== '' && (
-                      <input type="hidden" name="waist_size" value={waistSelect} />
-                    )}
-                    <p className="text-xs text-muted-foreground">Select 26-44 or choose Custom</p>
+                    <Label htmlFor="waist_size">Waist Size or Range (inches) *</Label>
+                    <Input 
+                      id="waist_size"
+                      name="waist_size" 
+                      type="text" 
+                      inputMode="numeric"
+                      placeholder="e.g., 28 or 26-44" 
+                      className={`bg-transparent ${validationErrors.waist_size ? 'border-destructive' : ''}`} 
+                      required 
+                    />
+                    <p className="text-xs text-muted-foreground">Enter a single number or range like 26-44</p>
                     {validationErrors.waist_size && (
                       <p className="text-destructive text-sm">{validationErrors.waist_size}</p>
                     )}

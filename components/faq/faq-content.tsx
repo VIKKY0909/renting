@@ -228,7 +228,7 @@ export default function FAQContent() {
                 href="tel:+917724023688"
                 className="px-8 py-4 bg-card border-2 border-primary rounded-full font-medium hover:bg-primary/10 transition-all duration-300"
               >
-                Call: +91 9329862253
+                Call: +91 7724023688
               </a>
             </div>
           </motion.div>
