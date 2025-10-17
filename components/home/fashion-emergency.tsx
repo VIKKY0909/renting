@@ -19,7 +19,7 @@ export function FashionEmergency() {
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-accent" />
-                  <a href="tel:+919329862253" className="text-lg font-semibold hover:text-accent transition-colors">
+                  <a href="tel:+917724023688" className="text-lg font-semibold hover:text-accent transition-colors">
                     +91 9329862253
                   </a>
                 </div>

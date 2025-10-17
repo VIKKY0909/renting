@@ -107,7 +107,7 @@ export const Footer = memo(function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4" />
-                <a href="tel:+919329862253" className="hover:text-primary transition-colors">
+                <a href="tel:+917724023688" className="hover:text-primary transition-colors">
                   +91 9329862253
                 </a>
               </li>
@@ -132,3 +132,4 @@ export const Footer = memo(function Footer() {
     </footer>
   )
 })
+
