@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Prepare comprehensive data for Web3Forms
     const formData = new FormData()
-    const accessKey = process.env.WEB3_API_KEY || '2d818c53-0521-4984-908b-a91cdae03cd2'
+    const accessKey = process.env.WEB3_API_KEY || 'ghkh'
     
     // Debug: Log access key status
     console.log('🔑 Access Key Status:', {
