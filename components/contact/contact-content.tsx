@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2 } from "lucide-react"
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2, Heart, Sparkles, Star, MessageCircle, Users, Shield, Zap } from "lucide-react"
 
 export default function ContactContent() {
   const [formData, setFormData] = useState({
@@ -72,303 +72,379 @@ export default function ContactContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Have questions about our rental service? Need help with your order? 
-            We're here to help! Reach out to us and we'll get back to you as soon as possible.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Information */}
-          <div className="space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Phone className="h-5 w-5" />
-                  Phone
-                </CardTitle>
-                <CardDescription>
-                  Call us for immediate assistance
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a href="tel:+917724023688" className="text-lg font-medium hover:text-primary transition-colors">
-                  +91 7724023688
-                </a>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Available 9 AM - 8 PM, Monday to Saturday
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Mail className="h-5 w-5" />
-                  Email
-                </CardTitle>
-                <CardDescription>
-                  Send us an email and we'll respond within 24 hours
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a href="mailto:contactrentimade@gmail.com" className="text-lg font-medium hover:text-primary transition-colors">
-                  contactrentimade@gmail.com
-                </a>
-                <p className="text-sm text-muted-foreground mt-2">
-                  We typically respond within 2-4 hours during business hours
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Location
-                </CardTitle>
-                <CardDescription>
-                  Visit our showroom
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-lg font-medium">Indore, Madhya Pradesh</p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  By appointment only. Please call to schedule a visit.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Business Hours
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Monday - Friday</span>
-                    <span>9:00 AM - 8:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Saturday</span>
-                    <span>10:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sunday</span>
-                    <span>Closed</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/5 via-background to-secondary/5">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="container mx-auto px-4 py-20 relative">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in">
+              <Heart className="h-4 w-4" />
+              We're here to help you shine
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-fade-in-up">
+              Let's Connect
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              Have questions about our designer rentals? Need styling advice? 
+              We're your fashion partners, ready to make your special moments unforgettable.
+            </p>
+            <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span>Expert Styling</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-primary" />
+                <span>Secure & Safe</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-primary" />
+                <span>Quick Response</span>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
 
-          {/* Contact Form */}
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Send us a Message</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll get back to you soon
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Success Animation */}
-                {isSuccess && (
-                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg animate-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0">
-                        <CheckCircle className="h-6 w-6 text-green-600 animate-pulse" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-green-800">
-                          Message sent successfully!
-                        </h3>
-                        <p className="text-sm text-green-700 mt-1">
-                          Thank you for contacting us. We'll get back to you within 24 hours.
-                        </p>
-                      </div>
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Contact Information - Elegant Cards */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="text-center lg:text-left mb-8">
+                <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
+                <p className="text-muted-foreground">
+                  Choose your preferred way to reach us
+                </p>
+              </div>
+
+              {/* Phone Card */}
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-primary/20 rounded-xl group-hover:bg-primary/30 transition-colors">
+                      <Phone className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-2">Call Us</h3>
+                      <a href="tel:+917724023688" className="text-primary font-medium text-lg hover:underline">
+                        +91 7724023688
+                      </a>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Available 9 AM - 8 PM, Monday to Saturday
+                      </p>
                     </div>
                   </div>
-                )}
+                </CardContent>
+              </Card>
 
-                {/* Error Message */}
-                {error && (
-                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg animate-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0">
-                        <div className="h-6 w-6 rounded-full bg-red-100 flex items-center justify-center">
-                          <span className="text-red-600 text-sm font-bold">!</span>
+              {/* Email Card */}
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-secondary/5 to-secondary/10">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-secondary/20 rounded-xl group-hover:bg-secondary/30 transition-colors">
+                      <Mail className="h-6 w-6 text-secondary-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-2">Email Us</h3>
+                      <a href="mailto:contactrentimade@gmail.com" className="text-secondary-foreground font-medium text-lg hover:underline">
+                        contactrentimade@gmail.com
+                      </a>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        We respond within 2-4 hours during business hours
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Location Card */}
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-accent/5 to-accent/10">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-accent/20 rounded-xl group-hover:bg-accent/30 transition-colors">
+                      <MapPin className="h-6 w-6 text-accent-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-2">Visit Us</h3>
+                      <p className="font-medium text-lg">Indore, Madhya Pradesh</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        By appointment only. Please call to schedule a visit.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Business Hours */}
+              <Card className="border-0 bg-gradient-to-br from-muted/50 to-muted/30">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-muted rounded-xl">
+                      <Clock className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-4">Business Hours</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Monday - Friday</span>
+                          <span className="font-medium">9:00 AM - 8:00 PM</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Saturday</span>
+                          <span className="font-medium">10:00 AM - 6:00 PM</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Sunday</span>
+                          <span className="font-medium text-muted-foreground">Closed</span>
                         </div>
                       </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-red-800">
-                          Error sending message
-                        </h3>
-                        <p className="text-sm text-red-700 mt-1">{error}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Contact Form - Elegant Design */}
+            <div className="lg:col-span-2">
+              <Card className="border-0 shadow-xl bg-gradient-to-br from-background to-muted/20">
+                <CardHeader className="text-center pb-8">
+                  <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    <MessageCircle className="h-4 w-4" />
+                    Send us a message
+                  </div>
+                  <CardTitle className="text-3xl font-bold">We'd love to hear from you</CardTitle>
+                  <CardDescription className="text-lg">
+                    Tell us about your special occasion and let us help you find the perfect outfit
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  {/* Success Animation */}
+                  {isSuccess && (
+                    <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl animate-in slide-in-from-top-2 duration-500">
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="p-3 bg-green-100 rounded-full">
+                            <CheckCircle className="h-6 w-6 text-green-600 animate-pulse" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-green-800 mb-1">
+                            Message sent successfully! ✨
+                          </h3>
+                          <p className="text-green-700">
+                            Thank you for reaching out! We'll get back to you within 24 hours with styling recommendations.
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium mb-2">
-                        Full Name *
+                  {/* Error Message */}
+                  {error && (
+                    <div className="mb-8 p-6 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-2xl animate-in slide-in-from-top-2 duration-500">
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="p-3 bg-red-100 rounded-full">
+                            <span className="text-red-600 text-lg font-bold">!</span>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-red-800 mb-1">
+                            Oops! Something went wrong
+                          </h3>
+                          <p className="text-red-700">{error}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label htmlFor="name" className="block text-sm font-semibold text-foreground">
+                          Full Name *
+                        </label>
+                        <Input
+                          id="name"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                          disabled={isSubmitting}
+                          placeholder="Your beautiful name"
+                          className={`h-12 text-base ${isSuccess ? "bg-green-50 border-green-200" : ""}`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="email" className="block text-sm font-semibold text-foreground">
+                          Email Address *
+                        </label>
+                        <Input
+                          id="email"
+                          name="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          disabled={isSubmitting}
+                          placeholder="your.email@example.com"
+                          className={`h-12 text-base ${isSuccess ? "bg-green-50 border-green-200" : ""}`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="subject" className="block text-sm font-semibold text-foreground">
+                        What's this about? *
                       </label>
                       <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
+                        id="subject"
+                        name="subject"
+                        value={formData.subject}
                         onChange={handleChange}
                         required
                         disabled={isSubmitting}
-                        placeholder="Your full name"
-                        className={isSuccess ? "bg-green-50 border-green-200" : ""}
+                        placeholder="Wedding, party, special event..."
+                        className={`h-12 text-base ${isSuccess ? "bg-green-50 border-green-200" : ""}`}
                       />
                     </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
-                        Email Address *
+
+                    <div className="space-y-2">
+                      <label htmlFor="message" className="block text-sm font-semibold text-foreground">
+                        Tell us more *
                       </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
+                      <Textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
                         onChange={handleChange}
                         required
                         disabled={isSubmitting}
-                        placeholder="your.email@example.com"
-                        className={isSuccess ? "bg-green-50 border-green-200" : ""}
+                        placeholder="Share your vision, event details, or any questions you have. We're here to help you look absolutely stunning!"
+                        rows={6}
+                        className={`text-base resize-none ${isSuccess ? "bg-green-50 border-green-200" : ""}`}
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label htmlFor="subject" className="block text-sm font-medium mb-2">
-                      Subject *
-                    </label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      disabled={isSubmitting}
-                      placeholder="What's this about?"
-                      className={isSuccess ? "bg-green-50 border-green-200" : ""}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium mb-2">
-                      Message *
-                    </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      disabled={isSubmitting}
-                      placeholder="Tell us how we can help you..."
-                      rows={6}
-                      className={isSuccess ? "bg-green-50 border-green-200" : ""}
-                    />
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full relative overflow-hidden"
-                    disabled={isSubmitting || isSuccess}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Sending Message...
-                      </>
-                    ) : isSuccess ? (
-                      <>
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Message Sent!
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4 mr-2" />
-                        Send Message
-                      </>
-                    )}
-                    
-                    {/* Animated background for success state */}
-                    {isSuccess && (
-                      <div className="absolute inset-0 bg-green-500 animate-pulse opacity-20" />
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                    <Button 
+                      type="submit" 
+                      className="w-full h-14 text-lg font-semibold relative overflow-hidden group"
+                      disabled={isSubmitting || isSuccess}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                          Sending your message...
+                        </>
+                      ) : isSuccess ? (
+                        <>
+                          <CheckCircle className="h-5 w-5 mr-3" />
+                          Message sent! ✨
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-5 w-5 mr-3 group-hover:translate-x-1 transition-transform" />
+                          Send Message
+                        </>
+                      )}
+                      
+                      {/* Animated background for success state */}
+                      {isSuccess && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 animate-pulse opacity-20" />
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
 
-        {/* FAQ Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">How does the rental process work?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Browse our collection, select your outfit, choose rental duration, and we'll deliver it to your doorstep. 
-                  Return it after your event and we'll handle the cleaning.
-                </p>
-              </CardContent>
-            </Card>
+          {/* FAQ Section - Elegant Design */}
+          <div className="mt-24">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Users className="h-4 w-4" />
+                Common Questions
+              </div>
+              <h2 className="text-4xl font-bold mb-6">Frequently Asked Questions</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Everything you need to know about our rental service
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-primary/20 rounded-xl group-hover:bg-primary/30 transition-colors">
+                      <Sparkles className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3">How does the rental process work?</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Browse our curated collection, select your dream outfit, choose your rental duration, 
+                        and we'll deliver it to your doorstep. After your special event, simply return it 
+                        and we'll handle all the cleaning and care.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">What if the outfit doesn't fit?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  We provide detailed size charts and measurements. If the outfit doesn't fit perfectly, 
-                  contact us immediately and we'll arrange a replacement or refund.
-                </p>
-              </CardContent>
-            </Card>
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-secondary/5 to-secondary/10">
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-secondary/20 rounded-xl group-hover:bg-secondary/30 transition-colors">
+                      <Heart className="h-6 w-6 text-secondary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3">What if the outfit doesn't fit perfectly?</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        We provide detailed size charts and measurements for every outfit. If something 
+                        doesn't fit perfectly, contact us immediately and we'll arrange a replacement 
+                        or full refund - your satisfaction is our priority.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">How do I return the outfit?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Simply pack the outfit in the provided bag and schedule a pickup. 
-                  We'll collect it from your location at the agreed time.
-                </p>
-              </CardContent>
-            </Card>
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-accent/5 to-accent/10">
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-accent/20 rounded-xl group-hover:bg-accent/30 transition-colors">
+                      <Zap className="h-6 w-6 text-accent-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3">How do I return the outfit?</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Simply pack the outfit in the provided premium bag and schedule a pickup. 
+                        We'll collect it from your location at the agreed time - it's that simple!
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Is there a security deposit?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Yes, we require a security deposit which is fully refundable upon return of the outfit in good condition.
-                </p>
-              </CardContent>
-            </Card>
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-muted/50 to-muted/30">
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-muted rounded-xl group-hover:bg-muted/80 transition-colors">
+                      <Shield className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3">Is there a security deposit?</h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Yes, we require a security deposit which is fully refundable upon return 
+                        of the outfit in good condition. This helps us maintain our premium collection.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
