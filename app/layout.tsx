@@ -22,9 +22,8 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Rentimade - Rent & Lend Designer Clothes in India",
-  description:
-    "Your dream outfit on rent. Explore designer sarees, lehengas, gowns, and more at affordable prices. Sustainable fashion made easy.",
-    generator: 'v0.app'
+  description: "Your dream outfit on rent. Explore designer sarees, lehengas, gowns, and more at affordable prices. Sustainable fashion made easy.",
+  generator: "v0.app"
 }
 
 export default function RootLayout({
