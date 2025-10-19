@@ -20,7 +20,7 @@ export async function uploadImageToCloudinary(file: File): Promise<string> {
 
     // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'rentimade/products',
+      folder: 'rentimade/banners',
       resource_type: 'auto',
       quality: 'auto',
       fetch_format: 'auto',
@@ -49,5 +49,5 @@ export function getPublicIdFromUrl(url: string): string {
   const parts = url.split('/')
   const filename = parts[parts.length - 1]
   const publicId = filename.split('.')[0]
-  return `rentimade/products/${publicId}`
+  return `rentimade/banners/${publicId}`
 }

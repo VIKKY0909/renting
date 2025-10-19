@@ -6,29 +6,21 @@ import { Button } from "@/components/ui/button"
 
 const stories = [
   {
-    name: "Priya Sharma",
-    location: "Mumbai",
-    image: "/indian-woman-in-designer-lehenga.jpg",
-    story: "Rented a beautiful lehenga for my sister's wedding. The quality was amazing and I saved so much money!",
+    name: "Reena Neema",
+    location: "Indore",
+    image: "/reema.jpeg",
+    story: "The lehenga I rented Is so stunning and delivery process is so smooth no extra chaos needed",
     rating: 5,
     outfit: "Designer Lehenga",
   },
   {
-    name: "Ananya Patel",
-    location: "Delhi",
-    image: "/indian-woman-in-elegant-saree.jpg",
-    story: "The saree I rented was absolutely stunning. Delivery was on time and the return process was hassle-free.",
+    name: "Ruchi Sharma",
+    location: "Khandwa",
+    image: "/ruchi.jpeg",
+    story: "This saree is perfect for my mehendi. Rentimade is so good , highly recommended.",
     rating: 5,
     outfit: "Silk Saree",
-  },
-  {
-    name: "Riya Desai",
-    location: "Bangalore",
-    image: "/indian-woman-in-designer-gown.jpg",
-    story: "Perfect gown for my engagement party. Everyone asked where I got it from. Highly recommend Rentimade!",
-    rating: 5,
-    outfit: "Evening Gown",
-  },
+  }
 ]
 
 export function CustomerStories() {

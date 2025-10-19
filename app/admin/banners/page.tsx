@@ -48,6 +48,7 @@ export default function AdminBannersPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   // Redirect if not admin
   useEffect(() => {
@@ -102,8 +103,8 @@ export default function AdminBannersPage() {
       description: '',
       link_text: '',
       link_url: '',
-      image_url: '',
-      mobile_image_url: '',
+        image_url: '',
+        mobile_image_url: '',
       is_active: true,
       display_order: banners.length,
       category_id: '',
@@ -191,6 +192,7 @@ export default function AdminBannersPage() {
   }
 
   const handleImageUpload = async (file: File) => {
+    setIsUploading(true)
     try {
       const formData = new FormData()
       formData.append('file', file)
@@ -202,14 +204,21 @@ export default function AdminBannersPage() {
 
       if (response.ok) {
         const data = await response.json()
-        setEditingBanner(prev => prev ? { ...prev, image_url: data.url } : null)
+        setEditingBanner(prev => prev ? { 
+          ...prev, 
+          image_url: data.url,
+          mobile_image_url: data.url 
+        } : null)
         toast.success('Image uploaded successfully')
       } else {
-        toast.error('Failed to upload image')
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to upload image')
       }
     } catch (error) {
       console.error('Error uploading image:', error)
       toast.error('Error uploading image')
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -380,29 +389,117 @@ export default function AdminBannersPage() {
               {/* Image Upload */}
               <div>
                 <Label htmlFor="image">Banner Image *</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="image"
-                    value={editingBanner.image_url}
-                    onChange={(e) => setEditingBanner(prev => prev ? { ...prev, image_url: e.target.value } : null)}
-                    placeholder="Image URL"
-                  />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) handleImageUpload(file)
+                <div className="space-y-4">
+                  
+                  {editingBanner.image_url && !isUploading && (
+                    <div className="relative w-full h-48 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
+                      <img
+                        src={editingBanner.image_url}
+                        alt="Banner preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={() => setEditingBanner(prev => prev ? { ...prev, image_url: '' } : null)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Upload Animation */}
+                  {isUploading && (
+                    <div className="relative w-full h-48 border-2 border-dashed border-blue-400 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                        <p className="text-sm text-blue-600">Uploading image...</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Upload Area */}
+                  {/* <div className="flex gap-2">
+                    <Input
+                      id="image"
+                      value={editingBanner.image_url}
+                      onChange={(e) => setEditingBanner(prev => prev ? { ...prev, image_url: e.target.value } : null)}
+                      placeholder="Image URL or upload a file"
+                      className="flex-1"
+                      disabled={isUploading}
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) handleImageUpload(file)
+                      }}
+                      className="hidden"
+                      id="upload"
+                      disabled={isUploading}
+                    />
+                    <Label htmlFor="upload" asChild>
+                      <Button variant="outline" size="sm" type="button" disabled={isUploading}>
+                        {isUploading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-1"></div>
+                        ) : (
+                          <Upload className="h-4 w-4 mr-1" />
+                        )}
+                        {isUploading ? 'Uploading...' : 'Upload'}
+                        
+                      </Button>
+                    </Label>
+                  </div> */}
+                  
+                  {/* Drag and Drop Area */}
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                      isUploading 
+                        ? 'border-blue-400 bg-blue-50 cursor-not-allowed' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    onDragOver={(e) => {
+                      if (isUploading) return
+                      e.preventDefault()
+                      e.currentTarget.classList.add('border-blue-400', 'bg-blue-50')
                     }}
-                    className="hidden"
-                    id="upload"
-                  />
-                  <Label htmlFor="upload" asChild>
-                    <Button variant="outline" size="sm">
-                      <Upload className="h-4 w-4 mr-1" />
-                      Upload
-                    </Button>
-                  </Label>
+                    onDragLeave={(e) => {
+                      if (isUploading) return
+                      e.preventDefault()
+                      e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50')
+                    }}
+                    onDrop={(e) => {
+                      if (isUploading) return
+                      e.preventDefault()
+                      e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50')
+                      const files = e.dataTransfer.files
+                      if (files.length > 0) {
+                        handleImageUpload(files[0])
+                      }
+                    }}
+                    onClick={() => !isUploading && document.getElementById('upload')?.click()}
+                  >
+                    {isUploading ? (
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                        <p className="text-sm text-blue-600">Uploading image...</p>
+                        <p className="text-xs text-gray-500 mt-1">Please wait</p>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm text-gray-600">
+                          Drag and drop an image here, or click to select
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Supports: JPG, PNG, WebP (max 5MB) - Only one image per banner
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
