@@ -36,23 +36,24 @@ export async function POST(request: NextRequest) {
     // Get server-side IP address
     const serverIP = request.headers.get('x-forwarded-for') || 
                      request.headers.get('x-real-ip') || 
-                     request.connection?.remoteAddress || 
                      'Unknown'
 
     // Get server-side user agent
     const serverUserAgent = request.headers.get('user-agent') || 'Unknown'
 
+    // Check if Web3Forms API key is configured
+    const accessKey = process.env.WEB3_API_KEY
+    
+    if (!accessKey) {
+      console.error('❌ WEB3_API_KEY environment variable is not set')
+      return NextResponse.json(
+        { error: "Contact form is not properly configured. Please contact support." },
+        { status: 500 }
+      )
+    }
+
     // Prepare comprehensive data for Web3Forms
     const formData = new FormData()
-    const accessKey = process.env.WEB3_API_KEY || 'ghkh'
-    
-    // Debug: Log access key status
-    console.log('🔑 Access Key Status:', {
-      hasEnvVar: !!process.env.WEB3_API_KEY,
-      accessKeyLength: accessKey.length,
-      usingFallback: !process.env.WEB3_API_KEY
-    })
-    
     formData.append('access_key', accessKey)
     formData.append('name', name)
     formData.append('email', email)
