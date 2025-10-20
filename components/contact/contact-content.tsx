@@ -148,7 +148,7 @@ export default function ContactContent() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-2">Email Us</h3>
-                      <a href="mailto:contactrentimade@gmail.com" className="text-secondary-foreground font-medium text-lg hover:underline">
+                      <a href="mailto:contactrentimade@gmail.com" className="text-foreground font-medium text-lg hover:underline">
                         contactrentimade@gmail.com
                       </a>
                       <p className="text-sm text-muted-foreground mt-2">
