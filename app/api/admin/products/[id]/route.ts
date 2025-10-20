@@ -102,6 +102,7 @@ export async function PUT(
       status, 
       rejection_reason, 
       admin_notes, 
+      admin_description,
       availability_status,
       is_available 
     } = body
@@ -129,6 +130,10 @@ export async function PUT(
 
     if (admin_notes) {
       updateData.admin_notes = admin_notes
+    }
+
+    if (admin_description) {
+      updateData.admin_description = admin_description
     }
 
     if (availability_status) {

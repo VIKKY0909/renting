@@ -433,7 +433,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </TabsList>
           <TabsContent value="description" className="mt-8">
             <div className="prose prose-lg max-w-none">
-              <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+              <p className="text-muted-foreground leading-relaxed">{product.admin_description || product.description}</p>
 
               <div className="grid grid-cols-2 gap-4 mt-6 not-prose">
                 {product.brand && (

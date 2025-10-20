@@ -20,6 +20,14 @@ const stories = [
     story: "This saree is perfect for my mehendi. Rentimade is so good , highly recommended.",
     rating: 5,
     outfit: "Silk Saree",
+  },
+  {
+    name: "Sapna Mahajan",
+    location: "Khargone",
+    image: "/sapna.jpg",
+    story: "This saree is perfect for my mehendi. Rentimade is so good , highly recommended.",
+    rating: 5,
+    outfit: "Designer Lehenga",
   }
 ]
 

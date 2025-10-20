@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
         id, 
         title, 
         description, 
+        admin_description,
         short_description, 
         brand, 
         color, 
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
 
     // Apply search filter
     if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
+      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,admin_description.ilike.%${search}%`)
     }
 
     // Apply price filters

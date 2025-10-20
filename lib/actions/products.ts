@@ -19,7 +19,7 @@ export async function getProducts(filters?: {
       .from("products")
       .select(
         `
-        id, title, description, short_description, brand, color, fabric, occasion,
+        id, title, description, admin_description, short_description, brand, color, fabric, occasion,
         rental_price, security_deposit, original_price, bust, waist, length, sleeve_length,
         images, condition, status, is_available, total_rentals, average_rating,
         available_from, available_until, created_at, updated_at,
@@ -39,7 +39,7 @@ export async function getProducts(filters?: {
     // ✅ Search filter
     if (filters?.search) {
       query = query.or(
-        `title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`
+        `title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,admin_description.ilike.%${filters.search}%`
       )
     }
 
@@ -106,7 +106,7 @@ export async function getProductById(id: string) {
     .from("products")
     .select(
       `
-      id, title, description, short_description, brand, color, fabric, occasion,
+      id, title, description, admin_description, short_description, brand, color, fabric, occasion,
       rental_price, security_deposit, original_price, bust, waist, length, sleeve_length,
       images, condition, status, is_available, total_rentals, average_rating,
       available_from, available_until, created_at, updated_at,

@@ -83,7 +83,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
         </Link>
 
         <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
-          {truncateDescription(product.short_description || product.description)}
+          {truncateDescription(product.short_description || product.admin_description || product.description)}
         </p>
 
         <div className="flex items-center justify-between pt-2">

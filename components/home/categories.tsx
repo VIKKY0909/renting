@@ -3,12 +3,6 @@ import { Badge } from "@/components/ui/badge"
 
 const categories = [
   {
-    name: "Gowns",
-    image: "/elegant-designer-gown.jpg",
-    count: "150+ Styles",
-    href: "/browse?category=gowns",
-  },
-  {
     name: "Lehenga",
     image: "/traditional-indian-lehenga.jpg",
     count: "200+ Styles",
@@ -21,10 +15,16 @@ const categories = [
     href: "/browse?category=saree",
   },
   {
-    name: "Others",
+    name: "Indo-Western",
     image: "/indo-western-outfit.jpg",
     count: "100+ Styles",
-    href: "/browse?category=others",
+    href: "/browse?category=indo-western",
+  },
+  {
+    name: "Gowns",
+    image: "/elegant-designer-gown.jpg",
+    count: "150+ Styles",
+    href: "/browse?category=gown",
   },
 ]
 

@@ -1,9 +1,9 @@
 -- Insert default categories
 INSERT INTO public.categories (name, slug, description, image_url) VALUES
-  ('Lehenga', 'lehenga', 'Traditional Indian bridal and festive lehengas', '/placeholder.svg?height=400&width=400'),
-  ('Saree', 'saree', 'Elegant sarees for all occasions', '/placeholder.svg?height=400&width=400'),
-  ('Gown', 'gown', 'Designer gowns and evening wear', '/placeholder.svg?height=400&width=400'),
-  ('Indo-Western', 'indo-western', 'Fusion wear combining Indian and Western styles', '/placeholder.svg?height=400&width=400')
+  ('Lehenga', 'lehenga', 'Traditional Indian bridal and festive lehengas', '/traditional-indian-lehenga.jpg'),
+  ('Saree', 'saree', 'Elegant sarees for all occasions', '/designer-silk-saree.jpg'),
+  ('Gown', 'gown', 'Designer gowns and evening wear', '/elegant-designer-gown.jpg'),
+  ('Indo-Western', 'indo-western', 'Fusion wear combining Indian and Western styles', '/indo-western-outfit.jpg')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Insert sample FAQs

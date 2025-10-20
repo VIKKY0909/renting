@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Image from "next/image"
 
@@ -13,6 +16,7 @@ interface Product {
   id: string
   title: string
   description: string
+  admin_description?: string
   brand?: string
   color?: string
   fabric?: string
@@ -61,7 +65,11 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
   const [allProducts, setAllProducts] = useState<Product[]>([]) // For stats
   const [loading, setLoading] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [activeTab, setActiveTab] = useState("pending")
+  const [activeTab, setActiveTab] = useState("all")
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false)
+  const [adminDescription, setAdminDescription] = useState("")
+  const [adminNotes, setAdminNotes] = useState("")
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     fetchProducts()
@@ -101,14 +109,15 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
     }
   }
 
-  const handleProductAction = async (productId: string, action: string, notes?: string) => {
+  const handleProductAction = async (productId: string, action: string, notes?: string, adminDescription?: string) => {
     try {
       const response = await fetch(`/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: action,
-          admin_notes: notes
+          admin_notes: notes,
+          admin_description: adminDescription
         })
       })
 
@@ -124,6 +133,30 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
       console.error('Error updating product:', error)
       toast.error('Error updating product')
     }
+  }
+
+  const handleApproveProduct = async () => {
+    if (!selectedProduct || !adminDescription.trim()) {
+      toast.error('Admin description is required to approve a product')
+      return
+    }
+
+    setActionLoading(true)
+    try {
+      await handleProductAction(selectedProduct.id, 'approved', adminNotes, adminDescription)
+      setApprovalDialogOpen(false)
+      setAdminDescription("")
+      setAdminNotes("")
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const openApprovalDialog = (product: Product) => {
+    setSelectedProduct(product)
+    setAdminDescription("")
+    setAdminNotes("")
+    setApprovalDialogOpen(true)
   }
 
   const getStatusBadge = (status: string) => {
@@ -248,6 +281,11 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="overflow-x-auto">
               <TabsList className="grid w-full grid-cols-5 min-w-[500px]">
+                <TabsTrigger value="all" className="text-xs sm:text-sm">
+                  <span className="hidden sm:inline">All</span>
+                  <span className="sm:hidden">All</span>
+                  <span className="ml-1">({stats.total})</span>
+                </TabsTrigger>
                 <TabsTrigger value="pending" className="text-xs sm:text-sm">
                   <span className="hidden sm:inline">Pending</span>
                   <span className="sm:hidden">Pend</span>
@@ -267,11 +305,6 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                   <span className="hidden sm:inline">Rejected</span>
                   <span className="sm:hidden">Rej</span>
                   <span className="ml-1">({stats.rejected})</span>
-                </TabsTrigger>
-                <TabsTrigger value="all" className="text-xs sm:text-sm">
-                  <span className="hidden sm:inline">All</span>
-                  <span className="sm:hidden">All</span>
-                  <span className="ml-1">({stats.total})</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -393,7 +426,7 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                                 <Button
                                   size="sm"
                                   className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm"
-                                  onClick={() => handleProductAction(product.id, 'approved')}
+                                  onClick={() => openApprovalDialog(product)}
                                 >
                                   <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                                   <span className="hidden sm:inline">Approve</span>
@@ -573,10 +606,7 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
                     <>
                       <Button
                         className="bg-green-600 hover:bg-green-700"
-                        onClick={() => {
-                          handleProductAction(selectedProduct.id, 'approved')
-                          setSelectedProduct(null)
-                        }}
+                        onClick={() => openApprovalDialog(selectedProduct)}
                       >
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Approve Product
@@ -615,6 +645,91 @@ export function AdminProductManagement({ initialProducts = [] }: ProductManageme
           </Card>
         </div>
       )}
+
+      {/* Product Approval Dialog */}
+      <Dialog open={approvalDialogOpen} onOpenChange={setApprovalDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Approve Product</DialogTitle>
+          </DialogHeader>
+          
+          {selectedProduct && (
+            <div className="space-y-6">
+              {/* Product Info */}
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">{selectedProduct.title}</h3>
+                <p className="text-sm text-muted-foreground mb-2">by {selectedProduct.profiles.full_name}</p>
+                <p className="text-sm">Category: {selectedProduct.categories.name}</p>
+              </div>
+
+              {/* Current Description */}
+              <div>
+                <Label className="text-sm font-medium">Current Description (User)</Label>
+                <div className="mt-2 p-3 bg-muted/30 rounded-lg">
+                  <p className="text-sm">{selectedProduct.description}</p>
+                </div>
+              </div>
+
+              {/* Admin Description */}
+              <div className="space-y-2">
+                <Label htmlFor="admin-description" className="text-sm font-medium">
+                  Admin Description <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="admin-description"
+                  value={adminDescription}
+                  onChange={(e) => setAdminDescription(e.target.value)}
+                  placeholder="Write a professional description that will be shown to customers. This will replace the user's description."
+                  className="min-h-32"
+                  rows={6}
+                />
+                <p className="text-xs text-muted-foreground">
+                  This description will be shown to all customers instead of the user's description.
+                </p>
+              </div>
+
+              {/* Admin Notes */}
+              <div className="space-y-2">
+                <Label htmlFor="admin-notes" className="text-sm font-medium">
+                  Admin Notes (Optional)
+                </Label>
+                <Textarea
+                  id="admin-notes"
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  placeholder="Add any internal notes about this product (not visible to customers)..."
+                  className="min-h-20"
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">
+                  These notes are only visible to admins and will not be shown to customers.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setApprovalDialogOpen(false)
+                setAdminDescription("")
+                setAdminNotes("")
+              }}
+              disabled={actionLoading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleApproveProduct}
+              disabled={actionLoading || !adminDescription.trim()}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {actionLoading ? 'Approving...' : 'Approve Product'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
