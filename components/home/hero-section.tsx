@@ -10,7 +10,7 @@ export function HeroSection() {
           {/* Promotional Badge */}
           <div className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-secondary/20 via-primary/20 to-accent/20 text-foreground text-sm font-medium animate-bounce-in border border-primary/20 backdrop-blur-sm">
             <Sparkles className="h-5 w-5 animate-float" />
-            <span className="font-semibold">Use code: firsttime2025 for extra discount</span>
+            <span className="font-semibold">Start your journey with us</span>
           </div>
 
           {/* Main Heading */}

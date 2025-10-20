@@ -162,7 +162,7 @@ export function AutoSliderBanner() {
   // Don't render if loading or no banners
   if (loading) {
     return (
-      <section className="relative h-[500px] md:h-[600px] overflow-hidden bg-gradient-to-br from-background to-muted/20 flex items-center justify-center">
+      <section className="relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden bg-gradient-to-br from-background to-muted/20 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </section>
     )
@@ -173,7 +173,7 @@ export function AutoSliderBanner() {
   }
 
   return (
-    <section className="relative h-[500px] md:h-[600px] overflow-hidden bg-gradient-to-br from-background to-muted/20">
+    <section className="relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden bg-gradient-to-br from-background to-muted/20">
       {/* Slides Container */}
       <div className="relative h-full">
         {bannerSlides.map((slide, index) => (
@@ -185,35 +185,37 @@ export function AutoSliderBanner() {
               'opacity-0 translate-x-full'
             }`}
           >
-            {/* Background Image */}
+            {/* Background Image - Responsive */}
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              className="absolute inset-0 w-full h-full"
               style={{
-                backgroundImage: `url(${slide.image_url})`,
-                filter: 'brightness(0.7)'
+                backgroundImage: `url(${slide.mobile_image_url || slide.image_url})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
               }}
             />
             
-            {/* Dark Gradient Overlay */}
+            {/* Enhanced gradient overlay for better text readability */}
             <div 
-              className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"
+              className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/40 to-black/20"
             />
             
             {/* Content */}
             <div className="relative h-full flex items-center">
-              <div className="container mx-auto px-4">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl">
                   <div className="animate-fade-in-up">
-                    <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
+                    <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-3 sm:mb-4 leading-tight drop-shadow-2xl" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.5)' }}>
                       {slide.title}
                     </h1>
                     {slide.subtitle && (
-                      <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold text-white/90 mb-6 gradient-text">
+                      <h2 className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white mb-4 sm:mb-6 gradient-text leading-tight drop-shadow-xl" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.4)' }}>
                         {slide.subtitle}
                       </h2>
                     )}
                     {slide.description && (
-                      <p className="text-lg md:text-xl text-white/80 mb-8 max-w-lg leading-relaxed">
+                      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white mb-6 sm:mb-8 max-w-lg leading-relaxed drop-shadow-lg" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.3)' }}>
                         {slide.description}
                       </p>
                     )}
@@ -221,7 +223,8 @@ export function AutoSliderBanner() {
                       <Link href={slide.link_url}>
                         <Button 
                           size="lg" 
-                          className="btn-luxury text-lg px-10 py-7 animate-scale-in-spring hover-glow shadow-2xl font-semibold"
+                          className="btn-luxury text-sm sm:text-base md:text-lg px-6 sm:px-8 lg:px-10 py-4 sm:py-6 lg:py-7 animate-scale-in-spring hover-glow shadow-2xl font-semibold w-full sm:w-auto border-2 border-white/20 backdrop-blur-sm"
+                          style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}
                         >
                           {slide.link_text || 'Shop Now'}
                         </Button>
@@ -235,31 +238,14 @@ export function AutoSliderBanner() {
         ))}
       </div>
 
-      {/* Navigation Arrows */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110"
-        onClick={prevSlide}
-      >
-        <ChevronLeft className="h-6 w-6" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110"
-        onClick={nextSlide}
-      >
-        <ChevronRight className="h-6 w-6" />
-      </Button>
+      {/* Navigation Arrows Removed */}
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
         {bannerSlides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
               index === currentSlide 
                 ? 'bg-white scale-125' 
                 : 'bg-white/50 hover:bg-white/70'
