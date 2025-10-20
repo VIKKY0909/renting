@@ -83,7 +83,7 @@ export function AdminProducts() {
     
     if (diffDays === 1) return "1 day ago"
     if (diffDays < 7) return `${diffDays} days ago`
-    return formatDate(date)
+    return date.toLocaleDateString()
   }
 
   if (loading) {

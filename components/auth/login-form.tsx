@@ -35,7 +35,7 @@ export function LoginForm() {
 
       if (error) throw error
 
-      router.push("/profile")
+      router.push("/")
       router.refresh()
     } catch (err: any) {
       setError(err.message || "Failed to sign in")
